@@ -1,0 +1,447 @@
+// ERP Full Pro — Prisma Schema
+// Version: 1.0.0 — Foundation
+//
+// Convenciones:
+// - IDs: cuid() (corto, seguro, sorteable cronologicamente)
+// - Todos los modelos: audit columns (createdAt, updatedAt, createdBy, updatedBy)
+// - Todos los modelos: soft delete (deletedAt, isActive)
+// - Todos los modelos: @@index([tenantId, isActive]) para performance
+// - Tablas BD: snake_case plural con @@map()
+// - Para agregar columna: agregar campo aqui + npx prisma migrate dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// TENANTS (Empresas)
+// ============================================================
+
+model Tenant {
+  id     String       @id @default(cuid())
+  name   String
+  slug   String       @unique // URL: app.com/[slug]/dashboard
+  plan   Plan         @default(FREE)
+  status TenantStatus @default(TRIAL)
+
+  // Configuracion (JSON flexible para agregar campos sin migrar)
+  settings  Json @default("{}") // TenantSettings
+  dteConfig Json? // DTEConfig El Salvador
+
+  // Limites por plan
+  maxUsers             Int @default(2)
+  maxProducts          Int @default(50)
+  maxInvoicesPerMonth  Int @default(20)
+
+  // Suscripcion
+  trialEndsAt     DateTime?
+  subscriptionId  String?
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relaciones
+  users         User[]
+  products      Product[]
+  categories    Category[]
+  customers     Customer[]
+  suppliers     Supplier[]
+  invoices      Invoice[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+
+  @@map("tenants")
+}
+
+enum Plan {
+  FREE
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum TenantStatus {
+  ACTIVE
+  TRIAL
+  SUSPENDED
+  CANCELLED
+  PENDING_DELETION
+}
+
+// ============================================================
+// USUARIOS Y AUTH
+// ============================================================
+
+model User {
+  id       String   @id @default(cuid())
+  tenantId String
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  email    String
+  name     String
+  password String   // bcrypt hash
+  role     UserRole @default(SELLER)
+  avatar   String?
+
+  // 2FA (preparado, no obligatorio inicialmente)
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean  @default(false)
+  backupCodes      String[] // Hashed backup codes
+
+  // Estado
+  isActive          Boolean   @default(true)
+  lastLoginAt       DateTime?
+  mustChangePassword Boolean  @default(false)
+
+  // Audit
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String?
+  deletedAt DateTime?
+
+  // Relaciones
+  sessions      Session[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId, isActive])
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  SELLER
+  ACCOUNTANT
+  VIEWER
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  refreshToken String   @unique // Hash del refresh token
+  jti          String   @unique // JWT ID para invalidacion
+  expiresAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ============================================================
+// AUDIT LOG
+// ============================================================
+
+model AuditLog {
+  id         String  @id @default(cuid())
+  tenantId   String
+  tenant     Tenant  @relation(fields: [tenantId], references: [id])
+  userId     String?
+  user       User?   @relation(fields: [userId], references: [id])
+  action     String  // "PRODUCT_CREATE", "INVOICE_CANCEL", "USER_LOGIN"
+  entityType String  // "Product", "Invoice", "User"
+  entityId   String?
+  oldData    Json?   // Snapshot antes del cambio
+  newData    Json?   // Snapshot despues del cambio
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?   // Datos extra segun el contexto
+
+  createdAt DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, entityType, entityId])
+  @@index([tenantId, userId])
+  @@map("audit_logs")
+}
+
+// ============================================================
+// PRODUCTOS Y CATEGORIAS
+// ============================================================
+
+model Category {
+  id          String    @id @default(cuid())
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+  name        String
+  description String?
+  color       String?   // Para UI (hex)
+  parentId    String?   // Para categorias anidadas
+  parent      Category? @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryTree")
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  products Product[]
+
+  @@index([tenantId, isActive])
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  supplierId  String?
+  supplier    Supplier? @relation(fields: [supplierId], references: [id])
+
+  name        String
+  description String?
+  sku         String?   // Codigo interno
+  barcode     String?   // Codigo de barras
+  unit        String    @default("unidad") // unidad, kg, litro, caja, etc
+  image       String?   // URL Cloudinary
+
+  // Precios
+  price       Decimal   @db.Decimal(12, 2) // Precio de venta (con IVA incluido)
+  cost        Decimal   @default(0) @db.Decimal(12, 2) // Costo de compra
+  taxRate     Decimal   @default(0.13) @db.Decimal(5, 4) // 0.13 = 13% IVA
+
+  // Inventario
+  stock       Decimal   @default(0) @db.Decimal(12, 3)
+  minStock    Decimal   @default(0) @db.Decimal(12, 3) // Alerta de stock bajo
+  maxStock    Decimal?  @db.Decimal(12, 3)
+  trackStock  Boolean   @default(true)
+
+  // Audit
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+
+  @@unique([tenantId, sku])
+  @@unique([tenantId, barcode])
+  @@index([tenantId, isActive])
+  @@index([tenantId, categoryId])
+  @@index([tenantId, stock])
+  @@map("products")
+}
+
+// ============================================================
+// CLIENTES
+// ============================================================
+
+model Customer {
+  id       String   @id @default(cuid())
+  tenantId String
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+
+  // Datos personales/empresa
+  name         String
+  docType      DocType  @default(DUI) // DUI, NIT, PASAPORTE, NRC
+  docNumber    String?
+  email        String?
+  phone        String?
+  address      String?
+  city         String?
+  department   String?
+  country      String  @default("SV")
+
+  // DTE
+  nit          String? // Para CCF
+  nrc          String? // Para credito fiscal
+  actividadEconomica String?
+
+  // Credito
+  creditLimit  Decimal @default(0) @db.Decimal(12, 2)
+  creditDays   Int     @default(0) // Dias de credito
+
+  notes    String?
+
+  // Audit
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  invoices Invoice[]
+
+  @@index([tenantId, isActive])
+  @@index([tenantId, docNumber])
+  @@map("customers")
+}
+
+enum DocType {
+  DUI
+  NIT
+  PASAPORTE
+  NRC
+  OTRO
+}
+
+// ============================================================
+// PROVEEDORES
+// ============================================================
+
+model Supplier {
+  id       String   @id @default(cuid())
+  tenantId String
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+
+  name        String
+  nit         String?
+  nrc         String?
+  email       String?
+  phone       String?
+  address     String?
+  contactName String?
+
+  // Condiciones comerciales
+  paymentDays Int     @default(0)
+  creditLimit Decimal @default(0) @db.Decimal(12, 2)
+
+  notes String?
+
+  // Audit
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  products Product[]
+
+  @@index([tenantId, isActive])
+  @@map("suppliers")
+}
+
+// ============================================================
+// FACTURAS (estructura base — se expande en Fase 2)
+// ============================================================
+
+model Invoice {
+  id         String        @id @default(cuid())
+  tenantId   String
+  tenant     Tenant        @relation(fields: [tenantId], references: [id])
+  customerId String?
+  customer   Customer?     @relation(fields: [customerId], references: [id])
+
+  // DTE
+  tipoDoc    TipoDocumento @default(CCF)
+  correlativo String
+  codigoGeneracion String @unique // UUID generado para MH
+  selloRecibido String?   // Sello del MH
+
+  // Totales
+  subtotal   Decimal @db.Decimal(12, 2)
+  descuento  Decimal @default(0) @db.Decimal(12, 2)
+  ivaDebito  Decimal @db.Decimal(12, 2)
+  total      Decimal @db.Decimal(12, 2)
+
+  // Estado
+  status     InvoiceStatus @default(DRAFT)
+  paymentMethod PaymentMethod @default(CASH)
+  notes      String?
+
+  // Audit
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  items InvoiceItem[]
+
+  @@index([tenantId, isActive])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+  @@unique([tenantId, tipoDoc, correlativo])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id         String  @id @default(cuid())
+  invoiceId  String
+  invoice    Invoice @relation(fields: [invoiceId], references: [id])
+  productId  String?
+
+  description String
+  quantity    Decimal @db.Decimal(12, 3)
+  unitPrice   Decimal @db.Decimal(12, 2)
+  discount    Decimal @default(0) @db.Decimal(12, 2)
+  taxRate     Decimal @default(0.13) @db.Decimal(5, 4)
+  subtotal    Decimal @db.Decimal(12, 2)
+  ivaAmount   Decimal @db.Decimal(12, 2)
+  total       Decimal @db.Decimal(12, 2)
+
+  createdAt DateTime @default(now())
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+enum TipoDocumento {
+  CCF  // Comprobante de Credito Fiscal
+  CF   // Consumidor Final
+  NC   // Nota de Credito
+  ND   // Nota de Debito
+  FE   // Factura de Exportacion
+  FSE  // Factura de Sujeto Excluido
+}
+
+enum InvoiceStatus {
+  DRAFT       // Borrador
+  SENT        // Enviado a MH
+  ACCEPTED    // Aceptado por MH
+  REJECTED    // Rechazado por MH
+  CANCELLED   // Anulado
+}
+
+enum PaymentMethod {
+  CASH        // Efectivo
+  CARD        // Tarjeta
+  TRANSFER    // Transferencia
+  CHECK       // Cheque
+  CREDIT      // Credito
+  MIXED       // Mixto
+}
+
+// ============================================================
+// NOTIFICACIONES IN-APP
+// ============================================================
+
+model Notification {
+  id       String   @id @default(cuid())
+  tenantId String
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+
+  type    String  // "STOCK_LOW", "INVOICE_OVERDUE", "SYSTEM"
+  title   String
+  message String
+  data    Json?   // { entityType, entityId, url }
+  read    Boolean  @default(false)
+  readAt  DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([tenantId, userId, read])
+  @@index([tenantId, userId, createdAt])
+  @@map("notifications")
+}
