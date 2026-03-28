@@ -5,21 +5,29 @@ import { Form, Input, Select, InputNumber, Switch, Row, Col } from "antd";
 import type { TipoCuenta, NaturalezaCuenta } from "@prisma/client";
 
 const TIPOS: { value: TipoCuenta; label: string }[] = [
-  { value: "ACTIVO",   label: "Activo" },
-  { value: "PASIVO",   label: "Pasivo" },
-  { value: "CAPITAL",  label: "Capital" },
-  { value: "INGRESO",  label: "Ingreso" },
-  { value: "COSTO",    label: "Costo" },
-  { value: "GASTO",    label: "Gasto" },
+  { value: "ACTIVO",         label: "Activo" },
+  { value: "PASIVO",         label: "Pasivo" },
+  { value: "CAPITAL",        label: "Capital" },
+  { value: "PATRIMONIO",     label: "Patrimonio" },
+  { value: "INGRESO",        label: "Ingreso" },
+  { value: "COSTO",          label: "Costo" },
+  { value: "GASTO",          label: "Gasto" },
+  { value: "CIERRE",         label: "Cierre" },
+  { value: "ORDEN_DEUDORA",  label: "Orden Deudora" },
+  { value: "ORDEN_ACREEDORA",label: "Orden Acreedora" },
 ];
 
 const NATURALEZA_BY_TIPO: Record<TipoCuenta, NaturalezaCuenta> = {
-  ACTIVO:  "DEUDORA",
-  COSTO:   "DEUDORA",
-  GASTO:   "DEUDORA",
-  PASIVO:  "ACREEDORA",
-  CAPITAL: "ACREEDORA",
-  INGRESO: "ACREEDORA",
+  ACTIVO:          "DEUDORA",
+  COSTO:           "DEUDORA",
+  GASTO:           "DEUDORA",
+  ORDEN_DEUDORA:   "DEUDORA",
+  PASIVO:          "ACREEDORA",
+  CAPITAL:         "ACREEDORA",
+  PATRIMONIO:      "ACREEDORA",
+  INGRESO:         "ACREEDORA",
+  CIERRE:          "ACREEDORA",
+  ORDEN_ACREEDORA: "ACREEDORA",
 };
 
 interface Props {
