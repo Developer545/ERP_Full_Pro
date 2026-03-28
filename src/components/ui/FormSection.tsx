@@ -1,63 +1,58 @@
 "use client";
 import type { ReactNode } from "react";
-import { Card, Typography, Space } from "antd";
+import { Divider, Typography, Space } from "antd";
 
 const { Text } = Typography;
 
-type SectionColor = "green" | "blue" | "orange" | "purple" | "red";
+type SectionColor = "green" | "blue" | "orange" | "purple" | "red" | "default";
 
-const COLOR_MAP: Record<SectionColor, { border: string; text: string; bg: string }> = {
-  green:  { border: "#059669", text: "#059669", bg: "rgba(5,150,105,0.03)" },
-  blue:   { border: "#2563eb", text: "#2563eb", bg: "rgba(37,99,235,0.03)" },
-  orange: { border: "#d97706", text: "#d97706", bg: "rgba(217,119,6,0.03)" },
-  purple: { border: "#7c3aed", text: "#7c3aed", bg: "rgba(124,58,237,0.03)" },
-  red:    { border: "#dc2626", text: "#dc2626", bg: "rgba(220,38,38,0.03)" },
+const COLOR_MAP: Record<SectionColor, string> = {
+  green:   "#059669",
+  blue:    "#2563eb",
+  orange:  "#d97706",
+  purple:  "#7c3aed",
+  red:     "#dc2626",
+  default: "rgba(0,0,0,0.45)",
 };
 
 interface FormSectionProps {
   /** Titulo de la seccion */
   title: string;
-  /** Icono opcional (elemento React, ej: <UserOutlined />) */
+  /** Icono opcional */
   icon?: ReactNode;
-  /** Color del acento lateral */
+  /** Color del titulo e icono */
   color?: SectionColor;
   /** Contenido (campos del formulario) */
   children: ReactNode;
 }
 
 /**
- * Agrupa campos de formulario en una seccion visual con acento de color.
- * Implementado 100% con Ant Design — sin clases CSS custom.
+ * Separador de secciones para formularios.
+ * Usa Divider de Ant Design — sin fondos de color, solo linea y texto sutil.
  *
  * @example
  * <FormSection title="Datos personales" icon={<UserOutlined />} color="green">
  *   <Form.Item label="Nombre">...</Form.Item>
- *   <Form.Item label="Email">...</Form.Item>
  * </FormSection>
  */
-export function FormSection({ title, icon, color = "green", children }: FormSectionProps) {
-  const c = COLOR_MAP[color];
+export function FormSection({ title, icon, color = "default", children }: FormSectionProps) {
+  const textColor = COLOR_MAP[color];
+
   return (
-    <Card
-      size="small"
-      style={{
-        marginBottom: 16,
-        borderLeft: `3px solid ${c.border}`,
-        borderRadius: 8,
-        background: c.bg,
-        border: `1px solid ${c.border}22`,
-        borderLeftColor: c.border,
-        borderLeftWidth: 3,
-      }}
-      styles={{ body: { padding: "12px 16px" } }}
-    >
-      <Space style={{ marginBottom: 10 }}>
-        {icon && <span style={{ color: c.text, display: "flex" }}>{icon}</span>}
-        <Text strong style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.5px", color: c.text }}>
-          {title}
-        </Text>
-      </Space>
+    <div style={{ marginBottom: 8 }}>
+      <Divider style={{ margin: "0 0 16px 0", borderColor: "rgba(0,0,0,0.08)" }}>
+        <Space size={5}>
+          {icon && (
+            <span style={{ color: textColor, fontSize: 13, display: "flex", alignItems: "center" }}>
+              {icon}
+            </span>
+          )}
+          <Text style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", color: textColor }}>
+            {title}
+          </Text>
+        </Space>
+      </Divider>
       {children}
-    </Card>
+    </div>
   );
 }
