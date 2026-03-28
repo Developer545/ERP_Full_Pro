@@ -20,9 +20,9 @@ export const POST = withApi(async (req) => {
         );
       }
 
-      const buffer = await file.arrayBuffer();
+      const arrayBuffer = await file.arrayBuffer();
       const wb = new ExcelJS.Workbook();
-      await wb.xlsx.load(buffer as Buffer);
+      await wb.xlsx.load(Buffer.from(arrayBuffer));
       const ws = wb.worksheets[0];
 
       const rows: Array<Record<string, unknown>> = [];
