@@ -7,25 +7,25 @@
    Para cambiar la paleta: editar palette.ts Y las variables de abajo.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Primario (Amber/Dorado) */
-  --color-primary:        #d4a017;
-  --color-primary-hover:  #b8880f;
-  --color-primary-light:  #fdf6e3;
-  --color-primary-dark:   #a07510;
+  /* Primario (Emerald Premium) */
+  --color-primary:        #059669;
+  --color-primary-hover:  #047857;
+  --color-primary-light:  #ecfdf5;
+  --color-primary-dark:   #065f46;
 
   /* Semanticos */
-  --color-success:        #52c41a;
-  --color-success-light:  #f6ffed;
-  --color-warning:        #faad14;
-  --color-warning-light:  #fffbe6;
-  --color-error:          #ff4d4f;
-  --color-error-light:    #fff1f0;
-  --color-info:           #1677ff;
-  --color-info-light:     #e6f4ff;
+  --color-success:        #16a34a;
+  --color-success-light:  #f0fdf4;
+  --color-warning:        #d97706;
+  --color-warning-light:  #fffbeb;
+  --color-error:          #dc2626;
+  --color-error-light:    #fef2f2;
+  --color-info:           #2563eb;
+  --color-info-light:     #eff6ff;
 
   /* Sidebar */
-  --sidebar-bg:           linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  --logo-gradient:        linear-gradient(135deg, #d4a017 0%, #a07510 100%);
+  --sidebar-bg:           linear-gradient(180deg, #0a0e1a 0%, #111827 60%, #0f172a 100%);
+  --logo-gradient:        linear-gradient(135deg, #059669 0%, #0d9488 100%);
 
   /* Layout — modo claro */
   --bg-layout:            #f5f5f5;
@@ -61,9 +61,19 @@
   font-weight: 600;
 }
 
-/* Seleccion de filas con el color primario */
+/* Seleccion de filas */
 .ant-table-wrapper .ant-table-row-selected > td {
   background-color: var(--color-primary-light) !important;
+}
+
+/* Item activo del sidebar — fuerza color primario sin depender de token AntD */
+.ant-menu-dark .ant-menu-item-selected,
+.ant-menu-dark.ant-menu-inline .ant-menu-item-selected {
+  background-color: var(--color-primary) !important;
+}
+.ant-menu-dark .ant-menu-item:hover,
+.ant-menu-dark.ant-menu-inline .ant-menu-item:hover {
+  background-color: rgba(5, 150, 105, 0.15) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

@@ -33,6 +33,7 @@ import { useSidebarStore } from "@/stores/sidebar-store";
 import { MENU_ITEMS, type MenuItemConfig } from "@/config/menu";
 import { APP_NAME } from "@/config/constants";
 import { useAuth } from "@/hooks/use-auth";
+import { PALETTE } from "@/config/palette";
 
 const { Sider } = Layout;
 const { Text } = Typography;
@@ -225,6 +226,8 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
             borderRight: 0,
             marginTop: 8,
             background: "transparent",
+            // Fuerza el color del item activo via CSS custom property
+            ["--ant-menu-dark-item-selected-bg" as string]: PALETTE.primary,
           }}
         />
       </div>

@@ -16,33 +16,41 @@
  */
 
 // ─── Color primario ───────────────────────────────────────────────────────────
-// Cambiar aqui para repintar toda la UI de un solo tiro.
-const PRIMARY           = "#d4a017"; // Dorado / Amber profesional
-const PRIMARY_HOVER     = "#b8880f"; // Tono mas oscuro para hover
-const PRIMARY_LIGHT     = "#fdf6e3"; // Fondo claro para iconos/badges
-const PRIMARY_DARK      = "#a07510"; // Para modo oscuro
+// ✏️  CAMBIAR AQUI para repintar toda la UI de un solo tiro.
+//
+// Paleta activa: Emerald Premium (verde esmeralda — moderno, SaaS premium)
+// Otras opciones comentadas para cambio rapido:
+//   Violet:  PRIMARY = "#7c3aed"  HOVER = "#6d28d9"  LIGHT = "#f5f3ff"
+//   Teal:    PRIMARY = "#0891b2"  HOVER = "#0e7490"  LIGHT = "#ecfeff"
+//   Rose:    PRIMARY = "#e11d48"  HOVER = "#be123c"  LIGHT = "#fff1f2"
+//   Amber:   PRIMARY = "#d97706"  HOVER = "#b45309"  LIGHT = "#fffbeb"
+const PRIMARY           = "#059669"; // Emerald 600 — verde esmeralda premium
+const PRIMARY_HOVER     = "#047857"; // Emerald 700 — hover mas oscuro
+const PRIMARY_LIGHT     = "#ecfdf5"; // Emerald 50  — fondo suave para iconos/badges
+const PRIMARY_DARK      = "#065f46"; // Emerald 900 — modo oscuro
 
 // ─── Colores semanticos ───────────────────────────────────────────────────────
-const SUCCESS           = "#52c41a";
-const SUCCESS_LIGHT     = "#f6ffed";
-const WARNING           = "#faad14";
-const WARNING_LIGHT     = "#fffbe6";
-const ERROR             = "#ff4d4f";
-const ERROR_LIGHT       = "#fff1f0";
-const INFO              = "#1677ff";
-const INFO_LIGHT        = "#e6f4ff";
+const SUCCESS           = "#16a34a"; // Green 600
+const SUCCESS_LIGHT     = "#f0fdf4";
+const WARNING           = "#d97706"; // Amber 600
+const WARNING_LIGHT     = "#fffbeb";
+const ERROR             = "#dc2626"; // Red 600
+const ERROR_LIGHT       = "#fef2f2";
+const INFO              = "#2563eb"; // Blue 600
+const INFO_LIGHT        = "#eff6ff";
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-const SIDEBAR_BG_FROM   = "#1a1a2e"; // Top del gradiente
-const SIDEBAR_BG_MID    = "#16213e"; // Medio
-const SIDEBAR_BG_TO     = "#0f3460"; // Bottom del gradiente
-const SIDEBAR_GRADIENT  = `linear-gradient(180deg, ${SIDEBAR_BG_FROM} 0%, ${SIDEBAR_BG_MID} 50%, ${SIDEBAR_BG_TO} 100%)`;
+// Slate oscuro premium — sofisticado, sin gradiente azulado
+const SIDEBAR_BG_FROM   = "#0a0e1a"; // Casi negro puro
+const SIDEBAR_BG_MID    = "#111827"; // Slate 900
+const SIDEBAR_BG_TO     = "#0f172a"; // Slate 950
+const SIDEBAR_GRADIENT  = `linear-gradient(180deg, ${SIDEBAR_BG_FROM} 0%, ${SIDEBAR_BG_MID} 60%, ${SIDEBAR_BG_TO} 100%)`;
 
-// Logo del sidebar — puede ser mono, duo o tricolor
-const LOGO_GRADIENT     = `linear-gradient(135deg, ${PRIMARY} 0%, ${PRIMARY_DARK} 100%)`;
+// Logo — gradiente esmeralda a teal
+const LOGO_GRADIENT     = `linear-gradient(135deg, ${PRIMARY} 0%, #0d9488 100%)`;
 
 // ─── Colores de avatar (ciclo para usuarios sin foto) ─────────────────────────
-const AVATAR_COLORS     = ["#d4a017", "#52c41a", "#1677ff", "#722ed1", "#fa8c16", "#eb2f96"];
+const AVATAR_COLORS     = ["#059669", "#7c3aed", "#0891b2", "#d97706", "#e11d48", "#0284c7"];
 
 // ─── Neutrales — Modo claro ───────────────────────────────────────────────────
 const BG_LAYOUT         = "#f5f5f5";
