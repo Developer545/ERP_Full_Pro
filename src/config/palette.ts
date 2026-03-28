@@ -18,16 +18,16 @@
 // ─── Color primario ───────────────────────────────────────────────────────────
 // ✏️  CAMBIAR AQUI para repintar toda la UI de un solo tiro.
 //
-// Paleta activa: Emerald Premium (verde esmeralda — moderno, SaaS premium)
+// Paleta activa: Orange Professional (naranja sutil — ERP empresarial)
 // Otras opciones comentadas para cambio rapido:
+//   Emerald: PRIMARY = "#059669"  HOVER = "#047857"  LIGHT = "#ecfdf5"
 //   Violet:  PRIMARY = "#7c3aed"  HOVER = "#6d28d9"  LIGHT = "#f5f3ff"
 //   Teal:    PRIMARY = "#0891b2"  HOVER = "#0e7490"  LIGHT = "#ecfeff"
 //   Rose:    PRIMARY = "#e11d48"  HOVER = "#be123c"  LIGHT = "#fff1f2"
-//   Amber:   PRIMARY = "#d97706"  HOVER = "#b45309"  LIGHT = "#fffbeb"
-const PRIMARY           = "#059669"; // Emerald 600 — verde esmeralda premium
-const PRIMARY_HOVER     = "#047857"; // Emerald 700 — hover mas oscuro
-const PRIMARY_LIGHT     = "#ecfdf5"; // Emerald 50  — fondo suave para iconos/badges
-const PRIMARY_DARK      = "#065f46"; // Emerald 900 — modo oscuro
+const PRIMARY           = "#ea580c"; // Orange 600 — naranja profesional
+const PRIMARY_HOVER     = "#c2410c"; // Orange 700 — hover mas oscuro
+const PRIMARY_LIGHT     = "#fff7ed"; // Orange 50  — fondo suave para iconos/badges
+const PRIMARY_DARK      = "#9a3412"; // Orange 800 — modo oscuro
 
 // ─── Colores semanticos ───────────────────────────────────────────────────────
 const SUCCESS           = "#16a34a"; // Green 600
@@ -46,11 +46,11 @@ const SIDEBAR_BG_MID    = "#111827"; // Slate 900
 const SIDEBAR_BG_TO     = "#0f172a"; // Slate 950
 const SIDEBAR_GRADIENT  = `linear-gradient(180deg, ${SIDEBAR_BG_FROM} 0%, ${SIDEBAR_BG_MID} 60%, ${SIDEBAR_BG_TO} 100%)`;
 
-// Logo — gradiente esmeralda a teal
-const LOGO_GRADIENT     = `linear-gradient(135deg, ${PRIMARY} 0%, #0d9488 100%)`;
+// Logo — gradiente naranja a amber
+const LOGO_GRADIENT     = `linear-gradient(135deg, ${PRIMARY} 0%, #d97706 100%)`;
 
 // ─── Colores de avatar (ciclo para usuarios sin foto) ─────────────────────────
-const AVATAR_COLORS     = ["#059669", "#7c3aed", "#0891b2", "#d97706", "#e11d48", "#0284c7"];
+const AVATAR_COLORS     = ["#ea580c", "#2563eb", "#7c3aed", "#059669", "#e11d48", "#0891b2"];
 
 // ─── Neutrales — Modo claro ───────────────────────────────────────────────────
 const BG_LAYOUT         = "#f5f5f5";
