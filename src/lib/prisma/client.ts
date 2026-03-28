@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { Pool, neonConfig } from "@neondatabase/serverless";
+import { neonConfig } from "@neondatabase/serverless";
 
 /**
  * Singleton de Prisma Client con adapter Neon serverless.
@@ -8,11 +8,13 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
  *
  * En desarrollo: reutiliza instancia en hot-reload (evita "too many connections")
  * En produccion: crea una sola instancia
+ *
+ * NOTA: Se usa connectionString directo en PrismaNeon (no Pool)
+ * porque la API del adapter en Prisma 7 + @prisma/adapter-neon@7 lo requiere asi.
  */
 
-// Neon serverless requiere el paquete 'ws' explicitamente en Node.js.
-// Node.js 22+ tiene WebSocket nativo pero NO funciona con Neon pooler.
-// Siempre usar 'ws' en entornos server (no Edge).
+// Neon serverless requiere ws explicitamente — Node.js 22+ tiene WebSocket nativo
+// pero NO es compatible con el cliente Neon. Siempre usar el paquete 'ws'.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 neonConfig.webSocketConstructor = require("ws");
 
@@ -26,9 +28,9 @@ function createPrismaClient(): PrismaClient {
     throw new Error("DATABASE_URL no esta configurada");
   }
 
+  // PrismaNeon acepta connectionString directamente en Prisma 7
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pool = new Pool({ connectionString }) as any;
-  const adapter = new PrismaNeon(pool);
+  const adapter = new PrismaNeon({ connectionString } as any);
 
   return new PrismaClient({
     adapter,

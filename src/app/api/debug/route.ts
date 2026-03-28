@@ -20,19 +20,18 @@ export async function GET() {
     return NextResponse.json({ error: "DATABASE_URL missing", env: envInfo }, { status: 500 });
   }
 
-  // Probar conexión con Neon Pool directo (sin Prisma)
+  // Probar con Prisma client
   try {
-    const ws = require("ws");
-    const { Pool, neonConfig } = require("@neondatabase/serverless");
-    neonConfig.webSocketConstructor = ws;
-
-    const pool = new Pool({ connectionString: dbUrl });
-    const result = await pool.query("SELECT 1 as ok, NOW() as ts");
-    await pool.end();
+    const { prisma } = await import("@/lib/prisma/client");
+    const result = await prisma.$queryRaw`SELECT 1 as ok`;
+    const userCount = await prisma.user.count();
+    const tenantCount = await prisma.tenant.count();
 
     return NextResponse.json({
       db: "ok",
-      row: result.rows[0],
+      result,
+      userCount,
+      tenantCount,
       env: envInfo,
     });
   } catch (error) {
