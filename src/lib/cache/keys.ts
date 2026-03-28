@@ -78,6 +78,16 @@ export const cxcKeys = {
   prefix: (tenantId: string) => `t:${tenantId}:cxc:`,
 };
 
+/** Empleados */
+export const empleadoKeys = {
+  list: (tenantId: string, params: string) =>
+    `t:${tenantId}:empleados:list:${params}`,
+  detail: (tenantId: string, id: string) =>
+    `t:${tenantId}:empleados:${id}`,
+  activos: (tenantId: string) => `t:${tenantId}:empleados:activos`,
+  prefix: (tenantId: string) => `t:${tenantId}:empleados:`,
+};
+
 /** Permisos de usuario */
 export const authKeys = {
   userPermissions: (userId: string) => `user:${userId}:permissions`,

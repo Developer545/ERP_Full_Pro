@@ -7,11 +7,11 @@
    Para cambiar la paleta: editar palette.ts Y las variables de abajo.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Primario (Orange Professional) */
-  --color-primary:        #ea580c;
-  --color-primary-hover:  #c2410c;
-  --color-primary-light:  #fff7ed;
-  --color-primary-dark:   #9a3412;
+  /* Primario — Speeddansys Orange #f47920 */
+  --color-primary:        #f47920;
+  --color-primary-hover:  #d96510;
+  --color-primary-light:  #fff4ec;
+  --color-primary-dark:   #b85410;
 
   /* Semanticos */
   --color-success:        #16a34a;
@@ -24,8 +24,8 @@
   --color-info-light:     #eff6ff;
 
   /* Sidebar */
-  --sidebar-bg:           linear-gradient(180deg, #0a0e1a 0%, #111827 60%, #0f172a 100%);
-  --logo-gradient:        linear-gradient(135deg, #ea580c 0%, #d97706 100%);
+  --sidebar-bg:           #111111;
+  --logo-gradient:        linear-gradient(135deg, #f47920 0%, #d96510 100%);
 
   /* Layout — modo claro */
   --bg-layout:            #f5f5f5;
@@ -73,7 +73,7 @@
 }
 .ant-menu-dark .ant-menu-item:hover,
 .ant-menu-dark.ant-menu-inline .ant-menu-item:hover {
-  background-color: rgba(234, 88, 12, 0.15) !important;
+  background-color: rgba(244, 121, 32, 0.1) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -110,7 +110,7 @@
 .ant-input-number-focused,
 .ant-picker-focused {
   border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.12) !important;
+  box-shadow: 0 0 0 2px rgba(244, 121, 32, 0.15) !important;
 }
 
 /* Textarea */

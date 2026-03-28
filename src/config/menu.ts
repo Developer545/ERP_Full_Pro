@@ -75,6 +75,7 @@ export const MENU_ITEMS: MenuItemConfig[] = [
     children: [
       { key: "/empleados", label: "Empleados", icon: "TeamOutlined" },
       { key: "/planilla", label: "Planilla", icon: "CalculatorOutlined" },
+      { key: "/aguinaldo", label: "Aguinaldo", icon: "GiftOutlined" },
     ],
   },
   {

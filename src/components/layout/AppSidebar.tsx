@@ -28,6 +28,7 @@ import {
   BookOutlined,
   LineChartOutlined,
   SettingOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { MENU_ITEMS, type MenuItemConfig } from "@/config/menu";
@@ -63,6 +64,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   BookOutlined: <BookOutlined />,
   LineChartOutlined: <LineChartOutlined />,
   SettingOutlined: <SettingOutlined />,
+  GiftOutlined: <GiftOutlined />,
 };
 
 interface AppSidebarProps {

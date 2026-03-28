@@ -61,6 +61,8 @@ model Tenant {
   accountsPayable     AccountPayable[]
   expenseCategories   ExpenseCategory[]
   expenses            Expense[]
+  employees           Employee[]
+  planillas           Planilla[]
 
   @@map("tenants")
 }
@@ -762,4 +764,157 @@ model Notification {
   @@index([tenantId, userId, read])
   @@index([tenantId, userId, createdAt])
   @@map("notifications")
+}
+
+// ============================================================
+// RRHH — EMPLEADOS + PLANILLA
+// ============================================================
+
+enum TipoContrato {
+  INDEFINIDO
+  PLAZO_FIJO
+  TEMPORAL
+  HONORARIOS
+}
+
+enum EstadoEmpleado {
+  ACTIVO
+  INACTIVO
+  LICENCIA
+  SUSPENDIDO
+}
+
+enum TipoAFP {
+  CRECER
+  CONFÍA
+}
+
+enum EstadoPlanilla {
+  BORRADOR
+  CERRADA
+  PAGADA
+}
+
+model Employee {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  // Datos personales
+  firstName       String
+  lastName        String
+  dui             String?   // Documento Unico de Identidad
+  nit             String?
+  nss             String?   // Numero Seguro Social (ISSS)
+  nup             String?   // Numero Unico Previsional (AFP)
+  email           String?
+  phone           String?
+  address         String?
+  birthDate       DateTime?
+  gender          String?   // M / F
+
+  // Datos laborales
+  cargo           String
+  departamento    String?
+  fechaIngreso    DateTime
+  tipoContrato    TipoContrato @default(INDEFINIDO)
+  estado          EstadoEmpleado @default(ACTIVO)
+
+  // Remuneracion
+  salarioBase     Decimal  @db.Decimal(12, 2)
+  tipoAFP         TipoAFP  @default(CONFÍA)
+
+  // Configuracion deducciones (porcentajes custom si aplica)
+  exentoISS       Boolean  @default(false)
+  exentoAFP       Boolean  @default(false)
+  exentoRenta     Boolean  @default(false)
+
+  notes           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String?
+  updatedBy       String?
+  deletedAt       DateTime?
+
+  planillaDetalles PlanillaDetalle[]
+
+  @@index([tenantId, isActive])
+  @@index([tenantId, estado])
+  @@map("employees")
+}
+
+model Planilla {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  periodo         String   // "2026-03" formato YYYY-MM
+  mes             Int      // 1-12
+  anio            Int
+  estado          EstadoPlanilla @default(BORRADOR)
+
+  // Totales calculados
+  empleadosCount  Int      @default(0)
+  totalBruto      Decimal  @db.Decimal(12, 2) @default(0)
+  totalISS        Decimal  @db.Decimal(12, 2) @default(0)  // ISSS empleado
+  totalAFP        Decimal  @db.Decimal(12, 2) @default(0)  // AFP empleado
+  totalRenta      Decimal  @db.Decimal(12, 2) @default(0)  // ISR retenido
+  totalDescuentos Decimal  @db.Decimal(12, 2) @default(0)
+  totalNeto       Decimal  @db.Decimal(12, 2) @default(0)
+
+  // Aporte patronal (gasto de la empresa)
+  totalISSPatronal Decimal @db.Decimal(12, 2) @default(0)
+  totalAFPPatronal Decimal @db.Decimal(12, 2) @default(0)
+  totalINSAFORP    Decimal @db.Decimal(12, 2) @default(0)
+
+  notes           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String?
+  updatedBy       String?
+
+  detalles        PlanillaDetalle[]
+
+  @@unique([tenantId, periodo])
+  @@index([tenantId, anio, mes])
+  @@map("planillas")
+}
+
+model PlanillaDetalle {
+  id          String   @id @default(cuid())
+  planillaId  String
+  planilla    Planilla @relation(fields: [planillaId], references: [id])
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id])
+
+  // Devengos
+  salarioBase     Decimal  @db.Decimal(12, 2)
+  diasTrabajados  Int      @default(30)
+  horasExtra      Decimal  @db.Decimal(12, 2) @default(0)
+  bonos           Decimal  @db.Decimal(12, 2) @default(0)
+  comisiones      Decimal  @db.Decimal(12, 2) @default(0)
+  otrosIngresos   Decimal  @db.Decimal(12, 2) @default(0)
+  totalBruto      Decimal  @db.Decimal(12, 2)
+
+  // Deducciones empleado
+  descuentoISS    Decimal  @db.Decimal(12, 2) @default(0)  // 3%
+  descuentoAFP    Decimal  @db.Decimal(12, 2) @default(0)  // 7.25%
+  descuentoRenta  Decimal  @db.Decimal(12, 2) @default(0)  // ISR tabla
+  otrasDeduciones Decimal  @db.Decimal(12, 2) @default(0)
+  totalDescuentos Decimal  @db.Decimal(12, 2)
+  salarioNeto     Decimal  @db.Decimal(12, 2)
+
+  // Aporte patronal (no descuenta al empleado)
+  issPatronal     Decimal  @db.Decimal(12, 2) @default(0)  // 7.5%
+  afpPatronal     Decimal  @db.Decimal(12, 2) @default(0)  // 8.75%
+  insaforp        Decimal  @db.Decimal(12, 2) @default(0)  // 1%
+
+  createdAt       DateTime @default(now())
+
+  @@unique([planillaId, employeeId])
+  @@index([planillaId])
+  @@index([employeeId])
+  @@map("planilla_detalles")
 }

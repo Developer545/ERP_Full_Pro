@@ -18,16 +18,17 @@
 // ─── Color primario ───────────────────────────────────────────────────────────
 // ✏️  CAMBIAR AQUI para repintar toda la UI de un solo tiro.
 //
-// Paleta activa: Orange Professional (naranja sutil — ERP empresarial)
-// Otras opciones comentadas para cambio rapido:
+// Paleta activa: Speeddansys Orange — naranja caido, warm, ERP profesional
+// Copiado de DeskERP tema "speeddansys-orange-light"
+// Otras opciones comentadas:
 //   Emerald: PRIMARY = "#059669"  HOVER = "#047857"  LIGHT = "#ecfdf5"
 //   Violet:  PRIMARY = "#7c3aed"  HOVER = "#6d28d9"  LIGHT = "#f5f3ff"
-//   Teal:    PRIMARY = "#0891b2"  HOVER = "#0e7490"  LIGHT = "#ecfeff"
 //   Rose:    PRIMARY = "#e11d48"  HOVER = "#be123c"  LIGHT = "#fff1f2"
-const PRIMARY           = "#ea580c"; // Orange 600 — naranja profesional
-const PRIMARY_HOVER     = "#c2410c"; // Orange 700 — hover mas oscuro
-const PRIMARY_LIGHT     = "#fff7ed"; // Orange 50  — fondo suave para iconos/badges
-const PRIMARY_DARK      = "#9a3412"; // Orange 800 — modo oscuro
+//   Dark:    PRIMARY = "#ea580c"  HOVER = "#c2410c"  LIGHT = "#fff7ed"
+const PRIMARY           = "#f47920"; // Speeddansys Orange — naranja warm original
+const PRIMARY_HOVER     = "#d96510"; // Hover mas profundo
+const PRIMARY_LIGHT     = "#fff4ec"; // Fondo suave iconos/badges
+const PRIMARY_DARK      = "#b85410"; // Modo oscuro
 
 // ─── Colores semanticos ───────────────────────────────────────────────────────
 const SUCCESS           = "#16a34a"; // Green 600
@@ -40,14 +41,14 @@ const INFO              = "#2563eb"; // Blue 600
 const INFO_LIGHT        = "#eff6ff";
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-// Slate oscuro premium — sofisticado, sin gradiente azulado
-const SIDEBAR_BG_FROM   = "#0a0e1a"; // Casi negro puro
-const SIDEBAR_BG_MID    = "#111827"; // Slate 900
-const SIDEBAR_BG_TO     = "#0f172a"; // Slate 950
-const SIDEBAR_GRADIENT  = `linear-gradient(180deg, ${SIDEBAR_BG_FROM} 0%, ${SIDEBAR_BG_MID} 60%, ${SIDEBAR_BG_TO} 100%)`;
+// Sidebar casi negro — igual que Speeddansys Orange (Light) del DeskERP
+const SIDEBAR_BG_FROM   = "#111111"; // Near black — igual que DeskERP
+const SIDEBAR_BG_MID    = "#111111";
+const SIDEBAR_BG_TO     = "#0a0a0a";
+const SIDEBAR_GRADIENT  = "#111111"; // Sin gradiente, fondo plano como en DeskERP
 
-// Logo — gradiente naranja a amber
-const LOGO_GRADIENT     = `linear-gradient(135deg, ${PRIMARY} 0%, #d97706 100%)`;
+// Logo — naranja Speeddansys
+const LOGO_GRADIENT     = `linear-gradient(135deg, ${PRIMARY} 0%, #d96510 100%)`;
 
 // ─── Colores de avatar (ciclo para usuarios sin foto) ─────────────────────────
 const AVATAR_COLORS     = ["#ea580c", "#2563eb", "#7c3aed", "#059669", "#e11d48", "#0891b2"];

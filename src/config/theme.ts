@@ -53,13 +53,13 @@ export const lightTheme: ThemeConfig = {
     },
     Layout: {
       headerBg:  PALETTE.bgContainer,
-      siderBg:   "#1a1a2e",
-      triggerBg: "#16213e",
+      siderBg:   "#111111",
+      triggerBg: "#0a0a0a",
     },
     Menu: {
-      darkItemBg:         "#1a1a2e",
-      darkSubMenuItemBg:  "#16213e",
-      darkItemSelectedBg: PALETTE.primary,
+      darkItemBg:         "#111111",
+      darkSubMenuItemBg:  "#0a0a0a",
+      darkItemSelectedBg: "rgba(244,121,32,0.15)",
     },
   },
 };
