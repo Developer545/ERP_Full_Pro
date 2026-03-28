@@ -24,6 +24,7 @@ try {
  * DATABASE_URL se lee desde .env.local (desarrollo) o variables de entorno (Vercel).
  */
 export default defineConfig({
+  // @ts-expect-error — earlyAccess es requerido en Prisma 7 (no esta en tipos estables aun)
   earlyAccess: true,
   schema: "prisma/schema.prisma",
   datasource: {
@@ -33,9 +34,11 @@ export default defineConfig({
     async adapter() {
       const { neonConfig, Pool } = await import("@neondatabase/serverless");
       const { PrismaNeon } = await import("@prisma/adapter-neon");
-      neonConfig.webSocketConstructor = (await import("ws")).default;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      neonConfig.webSocketConstructor = require("ws");
       const connectionString = process.env.DATABASE_URL!;
-      const pool = new Pool({ connectionString });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pool = new Pool({ connectionString }) as any;
       return new PrismaNeon(pool);
     },
   },

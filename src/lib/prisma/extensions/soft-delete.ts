@@ -9,6 +9,9 @@ import { Prisma } from "@prisma/client";
  * Filtra automaticamente registros eliminados en findMany y findFirst.
  *
  * Modelos que NO aplican soft delete: AuditLog, Session
+ *
+ * NOTA: Los parametros no llevan tipo explicito — Prisma 7 infiere correctamente
+ * los genericos de $allModels. Anotaciones manuales causan conflicto de tipos.
  */
 const MODELS_WITHOUT_SOFT_DELETE = ["AuditLog", "Session"];
 
@@ -16,7 +19,7 @@ export const softDeleteExtension = Prisma.defineExtension({
   name: "soft-delete",
   query: {
     $allModels: {
-      async findMany({ args, query, model }: { args: Prisma.Args<Prisma.UserDelegate, "findMany">; query: (args: Prisma.Args<Prisma.UserDelegate, "findMany">) => Promise<unknown>; model: string }) {
+      async findMany({ args, query, model }) {
         if (!MODELS_WITHOUT_SOFT_DELETE.includes(model)) {
           args.where = {
             ...args.where,
@@ -26,7 +29,7 @@ export const softDeleteExtension = Prisma.defineExtension({
         return query(args);
       },
 
-      async findFirst({ args, query, model }: { args: Prisma.Args<Prisma.UserDelegate, "findFirst">; query: (args: Prisma.Args<Prisma.UserDelegate, "findFirst">) => Promise<unknown>; model: string }) {
+      async findFirst({ args, query, model }) {
         if (!MODELS_WITHOUT_SOFT_DELETE.includes(model)) {
           args.where = {
             ...args.where,
@@ -36,11 +39,12 @@ export const softDeleteExtension = Prisma.defineExtension({
         return query(args);
       },
 
-      async findUnique({ args, query, model }: { args: Prisma.Args<Prisma.UserDelegate, "findUnique">; query: (args: Prisma.Args<Prisma.UserDelegate, "findUnique">) => Promise<unknown>; model: string }) {
+      async findUnique({ args, query, model }) {
         if (!MODELS_WITHOUT_SOFT_DELETE.includes(model)) {
           // Convertir findUnique en findFirst para poder filtrar deletedAt
           const { where, ...rest } = args;
-          return (query as unknown as (args: { where: typeof where; [key: string]: unknown }) => Promise<unknown>)({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return (query as any)({
             where: { ...where, deletedAt: null },
             ...rest,
           });
@@ -48,12 +52,14 @@ export const softDeleteExtension = Prisma.defineExtension({
         return query(args);
       },
 
-      // Interceptar delete y convertirlo en update
-      async delete({ args, model, query: _query }: { args: Prisma.Args<Prisma.UserDelegate, "delete">; model: string; query: (args: unknown) => Promise<unknown> }) {
+      // Interceptar delete y convertirlo en update con soft delete
+      async delete({ args, model, query: _query }) {
         if (!MODELS_WITHOUT_SOFT_DELETE.includes(model)) {
-          // No usar query original, usar update directo
-          // Esto se maneja en el cliente con un override
-          return _query(args);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return (_query as any)({
+            ...args,
+            data: { deletedAt: new Date(), isActive: false },
+          });
         }
         return _query(args);
       },

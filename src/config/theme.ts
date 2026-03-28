@@ -30,13 +30,13 @@ export const lightTheme: ThemeConfig = {
   },
   components: {
     Table: {
-      size: "small",
+      // size se aplica como prop en cada <Table size="small" />, no como token
       headerBg: "#fafafa",
       rowHoverBg: "#f5f5f5",
       borderColor: "#e8e8e8",
     },
     Card: {
-      size: "small",
+      // size se aplica como prop en cada <Card size="small" />, no como token
       paddingLG: 16,
     },
     Button: {
@@ -79,13 +79,13 @@ export const darkTheme: ThemeConfig = {
   },
   components: {
     Table: {
-      size: "small",
+      // size se aplica como prop en cada <Table size="small" />, no como token
       headerBg: "#1c2128",
       rowHoverBg: "#1c2128",
       borderColor: "#30363d",
     },
     Card: {
-      size: "small",
+      // size se aplica como prop en cada <Card size="small" />, no como token
       paddingLG: 16,
     },
     Button: {

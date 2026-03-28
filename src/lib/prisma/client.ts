@@ -26,7 +26,8 @@ function createPrismaClient(): PrismaClient {
     throw new Error("DATABASE_URL no esta configurada");
   }
 
-  const pool = new Pool({ connectionString });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pool = new Pool({ connectionString }) as any;
   const adapter = new PrismaNeon(pool);
 
   return new PrismaClient({
