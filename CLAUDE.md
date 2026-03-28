@@ -204,61 +204,63 @@ prisma/
 
 ## Modulos del ERP (orden de implementacion)
 
-### Fase 0 — Foundation (Semana 1)
+### Fase 0 — Foundation ✅ COMPLETA
 - [x] Setup Next.js 16 + TypeScript + Prisma 7 + Neon
-- [ ] Prisma Extensions (soft-delete, audit, tenant-filter)
-- [ ] Auth completo (login, register, JWT, refresh, middleware)
-- [ ] Layout dashboard (sidebar, header, breadcrumbs)
-- [ ] Tema Ant Design 6 (light/dark)
-- [ ] DataTable generico
-- [ ] FormModal generico
-- [ ] Cache dual (memoria + Redis opcional)
-- [ ] Error handling tipado + withApi wrapper
-- [ ] Logging (Pino) + Sentry
-- [ ] Env validadas (@t3-oss/env-nextjs)
+- [x] Prisma Extensions (soft-delete, audit, tenant-filter)
+- [x] Auth completo (login, register, JWT, refresh, middleware)
+- [x] Layout dashboard (sidebar, header, breadcrumbs)
+- [x] Tema Ant Design 6 (light/dark) — Speeddansys Orange #f47920
+- [x] DataTable generico
+- [x] FormModal generico
+- [x] Cache dual (memoria + Redis opcional)
+- [x] Error handling tipado + withApi wrapper
+- [x] Logging (Pino) + Sentry
+- [x] Env validadas (@t3-oss/env-nextjs)
+- [x] Paleta centralizada: `src/config/palette.ts` + `src/app/globals.css`
+- [x] FormSection component (Divider sutil con icono y color)
 
-### Fase 1 — Core (Semana 2)
-- [ ] Tenants + Configuracion empresa
-- [ ] Usuarios + Roles + Permisos
-- [ ] Productos + Categorias
-- [ ] Clientes
-- [ ] Proveedores
-- [ ] Dashboard basico (KPIs)
+### Fase 1 — Core ✅ COMPLETA
+- [x] Tenants + Configuracion empresa
+- [x] Usuarios + Roles + Permisos
+- [x] Productos + Categorias
+- [x] Clientes
+- [x] Proveedores
+- [x] Dashboard basico (KPIs con Recharts)
 
-### Fase 2 — Ventas (Semana 3)
-- [ ] POS (punto de venta)
-- [ ] Facturacion DTE (CCF, CF, NC, ND)
-- [ ] CxC (cuentas por cobrar)
-- [ ] Inventario / Kardex
+### Fase 2 — Ventas ✅ COMPLETA
+- [x] POS (punto de venta) con carrito Zustand
+- [x] Facturacion DTE (CCF, CF, NC, ND) El Salvador
+- [x] CxC (cuentas por cobrar)
+- [x] Inventario / Kardex
 
-### Fase 3 — Compras (Semana 4)
-- [ ] Ordenes de compra
-- [ ] Recepcion de mercaderia
-- [ ] CxP (cuentas por pagar)
-- [ ] Gastos + categorias
+### Fase 3 — Compras ✅ COMPLETA
+- [x] Ordenes de compra + recepcion de mercaderia
+- [x] CxP (cuentas por pagar)
+- [x] Gastos + categorias
 
-### Fase 4 — RRHH (Semana 5)
-- [ ] Empleados
-- [ ] Planilla SV (ISSS, AFP, Renta, INSAFORP)
-- [ ] Boletas de pago (PDF)
-- [ ] Aguinaldo + Vacaciones
+### Fase 4 — RRHH ✅ COMPLETA
+- [x] Empleados (CRUD + campos SV: DUI, NIT, NSS, AFP, exenciones)
+- [x] Planilla SV (ISSS 3%/7.5%, AFP 7.25%/8.75%, INSAFORP 1%, ISR tabla DGII 2024)
+- [x] Boletas de pago PDF (@react-pdf/renderer)
+- [x] Export Excel planilla (ExcelJS: hoja Planilla + hoja Resumen Patronal)
+- [x] Aguinaldo (15/19/21 dias segun Codigo de Trabajo SV)
 
-### Fase 5 — Contabilidad (Semana 6)
-- [ ] Catalogo de cuentas
-- [ ] Asientos contables
-- [ ] Partidas automaticas (desde POS, compras, planilla)
-- [ ] Libros (diario, mayor)
-- [ ] Estados financieros (balance, resultados)
+### Fase 5 — Contabilidad ❌ PENDIENTE (siguiente)
+- [ ] Catalogo de cuentas (PYMES SV: activo, pasivo, capital, ingresos, costos, gastos)
+- [ ] Asientos contables manuales
+- [ ] Partidas automaticas (desde POS, compras, planilla, gastos)
+- [ ] Libros contables (diario, mayor)
+- [ ] Estados financieros (Balance General, Estado de Resultados)
 
-### Fase 6 — SaaS + Polish (Semana 7)
-- [ ] Planes (FREE, BASIC, PRO, ENTERPRISE)
-- [ ] Suscripciones + limites por plan
-- [ ] Onboarding wizard
-- [ ] Reportes avanzados + exportacion
-- [ ] 2FA (TOTP)
-- [ ] Importacion masiva (Excel)
+### Fase 6 — SaaS + Polish ❌ PENDIENTE
+- [ ] Planes (FREE, BASIC, PRO, ENTERPRISE) + limites por plan
+- [ ] Suscripciones + feature flags por plan
+- [ ] Onboarding wizard (setup inicial tenant)
+- [ ] Reportes avanzados + exportacion (Excel/PDF)
+- [ ] 2FA (TOTP con otpauth)
+- [ ] Importacion masiva (Excel → Prisma)
 - [ ] Audit log viewer
-- [ ] Cron jobs (recordatorios, alertas stock)
+- [ ] Cron jobs (recordatorios vencimientos, alertas stock bajo)
 
 ## Convenciones de codigo
 

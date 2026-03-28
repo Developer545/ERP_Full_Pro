@@ -918,3 +918,125 @@ model PlanillaDetalle {
   @@index([employeeId])
   @@map("planilla_detalles")
 }
+
+// ============================================================
+// CONTABILIDAD
+// ============================================================
+
+/// Tipos de cuenta del catálogo contable PYMES El Salvador
+enum TipoCuenta {
+  ACTIVO
+  PASIVO
+  CAPITAL
+  INGRESO
+  COSTO
+  GASTO
+}
+
+/// Naturaleza del saldo de la cuenta
+enum NaturalezaCuenta {
+  DEUDORA  // Se debita para aumentar (Activo, Costo, Gasto)
+  ACREEDORA // Se acredita para aumentar (Pasivo, Capital, Ingreso)
+}
+
+/// Estado de un asiento contable
+enum EstadoAsiento {
+  BORRADOR   // Editable, no afecta saldos
+  PUBLICADO  // Firme, afecta saldos — no editable
+  ANULADO    // Reversado
+}
+
+/// Origen de la partida automática
+enum OrigenAsiento {
+  MANUAL       // Creado por el usuario
+  FACTURA_DTE  // Generado desde Factura DTE (POS / facturación)
+  COMPRA       // Generado desde Orden de Compra recibida
+  PLANILLA     // Generado desde Planilla mensual
+  GASTO        // Generado desde módulo de Gastos
+  AGUINALDO    // Generado desde cálculo de Aguinaldo
+}
+
+/// Catálogo de cuentas contables del tenant (Plan de cuentas PYMES SV)
+model AccountChart {
+  id        String   @id @default(cuid())
+  tenantId  String
+
+  codigo    String              // "1.1.1.01" — código jerárquico libre
+  nombre    String
+  tipo      TipoCuenta
+  naturaleza NaturalezaCuenta
+  nivel     Int                 // 1=mayor, 2=submajor, 3=analítica...
+  parentId  String?             // Cuenta padre (null = raíz)
+  parent    AccountChart?       @relation("CuentaHijos", fields: [parentId], references: [id])
+  hijos     AccountChart[]      @relation("CuentaHijos")
+
+  permiteMovimiento Boolean     @default(true)  // false = solo agrupadora
+  notas     String?
+
+  lines     JournalLine[]
+
+  isActive  Boolean  @default(true)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@unique([tenantId, codigo])
+  @@index([tenantId, isActive])
+  @@index([tenantId, tipo])
+  @@map("account_charts")
+}
+
+/// Cabecera del asiento contable (Diario General)
+model JournalEntry {
+  id        String   @id @default(cuid())
+  tenantId  String
+
+  numero    Int               // Correlativo por tenant/año
+  anio      Int
+  fecha     DateTime
+  concepto  String
+  estado    EstadoAsiento     @default(BORRADOR)
+  origen    OrigenAsiento     @default(MANUAL)
+  origenId  String?           // ID del documento origen (invoiceId, purchaseOrderId, etc.)
+
+  totalDebe  Decimal @db.Decimal(14, 2) @default(0)
+  totalHaber Decimal @db.Decimal(14, 2) @default(0)
+
+  lines     JournalLine[]
+
+  isActive  Boolean  @default(true)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  @@unique([tenantId, anio, numero])
+  @@index([tenantId, isActive])
+  @@index([tenantId, fecha])
+  @@index([tenantId, estado])
+  @@index([tenantId, origen, origenId])
+  @@map("journal_entries")
+}
+
+/// Líneas del asiento (débitos y créditos)
+model JournalLine {
+  id            String   @id @default(cuid())
+  entryId       String
+  entry         JournalEntry  @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  accountId     String
+  account       AccountChart  @relation(fields: [accountId], references: [id])
+
+  descripcion   String?
+  debe          Decimal @db.Decimal(14, 2) @default(0)
+  haber         Decimal @db.Decimal(14, 2) @default(0)
+  orden         Int     @default(0)
+
+  createdAt     DateTime @default(now())
+
+  @@index([entryId])
+  @@index([accountId])
+  @@map("journal_lines")
+}
