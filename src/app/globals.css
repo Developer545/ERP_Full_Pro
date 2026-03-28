@@ -77,6 +77,74 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   FORMULARIOS — estilos globales mejorados
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Label con acento esmeralda */
+.ant-form-item .ant-form-item-label > label {
+  font-weight: 600;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.75);
+  letter-spacing: 0.2px;
+}
+
+/* Requerido — cambia el asterisco al color primario */
+.ant-form-item-required::before {
+  color: var(--color-primary) !important;
+}
+
+/* Input / Select / InputNumber — borde mas sutil, focus esmeralda */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select:not(.ant-select-disabled) .ant-select-selector,
+.ant-input-number,
+.ant-picker {
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector,
+.ant-input-number-focused,
+.ant-picker-focused {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.12) !important;
+}
+
+/* Textarea */
+.ant-input[type="textarea"],
+textarea.ant-input {
+  border-radius: 8px !important;
+}
+
+/* Help text de error */
+.ant-form-item-explain-error {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+/* Modal header mejorado */
+.ant-modal .ant-modal-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.ant-modal .ant-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Modal footer mejorado */
+.ant-modal .ant-modal-footer {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    PRINT — Tickets / Facturas
    ═══════════════════════════════════════════════════════════════════════════ */
 @media print {

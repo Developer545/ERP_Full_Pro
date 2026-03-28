@@ -9,3 +9,5 @@ export type { KPIItem } from "./KPICards";
 export { PageHeader } from "./PageHeader";
 
 export { ConfirmDelete } from "./ConfirmDelete";
+
+export { FormSection } from "./FormSection";
