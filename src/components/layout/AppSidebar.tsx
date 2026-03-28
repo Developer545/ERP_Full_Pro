@@ -34,7 +34,6 @@ import { useSidebarStore } from "@/stores/sidebar-store";
 import { MENU_ITEMS, type MenuItemConfig } from "@/config/menu";
 import { APP_NAME } from "@/config/constants";
 import { useAuth } from "@/hooks/use-auth";
-import { PALETTE } from "@/config/palette";
 
 const { Sider } = Layout;
 const { Text } = Typography;
@@ -162,7 +161,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
         zIndex: 100,
         overflow: "auto",
         boxShadow: "2px 0 12px rgba(0,0,0,0.25)",
-        background: "var(--sidebar-bg)",
+        background: "var(--theme-sider-bg, #111111)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -185,7 +184,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
           style={{
             width: 32,
             height: 32,
-            background: "var(--logo-gradient)",
+            background: "var(--theme-primary, #f47920)",
             borderRadius: 8,
             display: "flex",
             alignItems: "center",
@@ -195,7 +194,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
             fontSize: 13,
             flexShrink: 0,
             letterSpacing: 0.5,
-            boxShadow: "0 2px 8px rgba(212,160,23,0.4)",
+            boxShadow: "0 2px 8px rgba(var(--theme-primary-rgb, 244,121,32), 0.4)",
           }}
         >
           ERP
@@ -228,8 +227,8 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
             borderRight: 0,
             marginTop: 8,
             background: "transparent",
-            // Fuerza el color del item activo via CSS custom property
-            ["--ant-menu-dark-item-selected-bg" as string]: PALETTE.primary,
+            // Fuerza el color del item activo via CSS custom property del tema activo
+            ["--ant-menu-dark-item-selected-bg" as string]: "var(--theme-menu-selected-bg)",
           }}
         />
       </div>
@@ -251,7 +250,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
             size={32}
             src={user?.avatar}
             style={{
-              background: "var(--logo-gradient)",
+              background: "var(--theme-primary, #f47920)",
               flexShrink: 0,
               fontSize: 13,
               fontWeight: 600,
