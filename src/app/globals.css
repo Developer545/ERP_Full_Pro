@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS v4 — nueva sintaxis de importacion */
+@import "tailwindcss/utilities";
+/* Nota: preflight (reset CSS) omitido para no conflictuar con Ant Design */
 
 /* Variables de tema global */
 :root {
