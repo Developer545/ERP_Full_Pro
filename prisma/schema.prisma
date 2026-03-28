@@ -56,7 +56,11 @@ model Tenant {
   auditLogs          AuditLog[]
   notifications      Notification[]
   inventoryMovements InventoryMovement[]
-  accountReceivables AccountReceivable[]
+  accountReceivables  AccountReceivable[]
+  purchaseOrders      PurchaseOrder[]
+  accountsPayable     AccountPayable[]
+  expenseCategories   ExpenseCategory[]
+  expenses            Expense[]
 
   @@map("tenants")
 }
@@ -328,7 +332,9 @@ model Supplier {
   updatedBy String?
   deletedAt DateTime?
 
-  products           Product[]
+  products        Product[]
+  purchaseOrders  PurchaseOrder[]
+  accountsPayable AccountPayable[]
 
   @@index([tenantId, isActive])
   @@map("suppliers")
@@ -528,6 +534,209 @@ enum CxCStatus {
   PAID      // Pagado
   OVERDUE   // Vencido
   CANCELLED // Anulado
+}
+
+// ============================================================
+// COMPRAS — Ordenes de Compra (Fase 3)
+// ============================================================
+
+model PurchaseOrder {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+
+  // Identificacion
+  numero    String  // Correlativo interno: "OC-00000001"
+  reference String? // Referencia del proveedor (factura, nota de envio, etc.)
+
+  // Totales
+  subtotal  Decimal @default(0) @db.Decimal(12, 2)
+  descuento Decimal @default(0) @db.Decimal(12, 2)
+  iva       Decimal @default(0) @db.Decimal(12, 2)
+  total     Decimal @default(0) @db.Decimal(12, 2)
+
+  // Fechas
+  fechaOrden    DateTime  @default(now())
+  fechaEsperada DateTime?
+  fechaRecibida DateTime?
+
+  status PurchaseStatus @default(DRAFT)
+  notes  String?
+
+  // Audit
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  items           PurchaseOrderItem[]
+  accountsPayable AccountPayable[]
+
+  @@index([tenantId, isActive])
+  @@index([tenantId, status])
+  @@index([tenantId, supplierId])
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(cuid())
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+
+  productId   String?
+  description String
+  quantity    Decimal @db.Decimal(10, 3)
+  unitCost    Decimal @db.Decimal(12, 2)
+  discount    Decimal @default(0) @db.Decimal(12, 2)
+  taxRate     Decimal @default(0.13) @db.Decimal(5, 4)
+  subtotal    Decimal @db.Decimal(12, 2)
+  ivaAmount   Decimal @default(0) @db.Decimal(12, 2)
+  total       Decimal @db.Decimal(12, 2)
+
+  // Recepcion parcial
+  quantityReceived Decimal @default(0) @db.Decimal(10, 3)
+
+  @@index([purchaseOrderId])
+  @@map("purchase_order_items")
+}
+
+enum PurchaseStatus {
+  DRAFT     // Borrador
+  SENT      // Enviada al proveedor
+  PARTIAL   // Recibida parcialmente
+  RECEIVED  // Recibida completa
+  CANCELLED // Cancelada
+}
+
+// ============================================================
+// CxP — Cuentas por Pagar (Fase 3)
+// ============================================================
+
+model AccountPayable {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  supplierId      String
+  supplier        Supplier       @relation(fields: [supplierId], references: [id])
+  purchaseOrderId String?
+  purchaseOrder   PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
+
+  // Datos del documento
+  documento  String  // Referencia de la factura del proveedor
+  descripcion String?
+
+  // Montos
+  montoTotal    Decimal @db.Decimal(12, 2)
+  montoPagado   Decimal @default(0) @db.Decimal(12, 2)
+  montoPendiente Decimal @db.Decimal(12, 2)
+
+  // Fechas
+  fechaEmision    DateTime @default(now())
+  fechaVencimiento DateTime
+
+  status CxPStatus @default(PENDING)
+  notes  String?
+
+  // Audit
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  payments AccountPayablePayment[]
+
+  @@index([tenantId, isActive])
+  @@index([tenantId, status])
+  @@index([tenantId, supplierId])
+  @@index([tenantId, fechaVencimiento])
+  @@map("accounts_payable")
+}
+
+model AccountPayablePayment {
+  id               String         @id @default(cuid())
+  accountPayableId String
+  accountPayable   AccountPayable @relation(fields: [accountPayableId], references: [id])
+
+  amount        Decimal       @db.Decimal(12, 2)
+  paymentMethod PaymentMethod @default(CASH)
+  reference     String?
+  notes         String?
+
+  createdAt DateTime @default(now())
+  createdBy String?
+
+  @@index([accountPayableId])
+  @@map("ap_payments")
+}
+
+enum CxPStatus {
+  PENDING   // Pendiente
+  PARTIAL   // Pago parcial
+  PAID      // Pagado
+  OVERDUE   // Vencido
+  CANCELLED // Anulado
+}
+
+// ============================================================
+// GASTOS (Fase 3)
+// ============================================================
+
+model ExpenseCategory {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  name  String
+  color String? // Hex color para UI
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  createdBy String?
+  deletedAt DateTime?
+
+  expenses Expense[]
+
+  @@index([tenantId, isActive])
+  @@map("expense_categories")
+}
+
+model Expense {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  categoryId String?
+  category   ExpenseCategory? @relation(fields: [categoryId], references: [id])
+
+  descripcion   String
+  monto         Decimal @db.Decimal(12, 2)
+  paymentMethod PaymentMethod @default(CASH)
+  reference     String? // Numero recibo, factura, etc.
+  fecha         DateTime @default(now())
+
+  // Comprobante (URL Cloudinary)
+  comprobanteUrl String?
+
+  notes     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  @@index([tenantId, isActive])
+  @@index([tenantId, categoryId])
+  @@index([tenantId, fecha])
+  @@map("expenses")
 }
 
 // ============================================================

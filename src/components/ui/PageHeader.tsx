@@ -23,8 +23,8 @@ interface PageHeaderProps {
  *
  * Estructura:
  * ┌─────────────────────────────────────────┐
- * │ Titulo           [actions]              │
- * │ Subtitulo                               │
+ * │ | Titulo           [actions]            │
+ * │   Subtitulo                             │
  * │ [extra]                                 │
  * ├─────────────────────────────────────────┤ (divider opcional)
  * └─────────────────────────────────────────┘
@@ -48,7 +48,7 @@ export function PageHeader({
   divider = true,
 }: PageHeaderProps) {
   return (
-    <div style={{ marginBottom: divider ? 0 : 24 }}>
+    <div style={{ marginBottom: 24 }}>
       <div
         style={{
           display: "flex",
@@ -59,7 +59,13 @@ export function PageHeader({
           marginBottom: extra ? 12 : 0,
         }}
       >
-        <div>
+        {/* Titulo con acento izquierdo */}
+        <div
+          style={{
+            borderLeft: "3px solid #1677ff",
+            paddingLeft: 12,
+          }}
+        >
           <Title level={4} style={{ margin: 0, lineHeight: 1.3 }}>
             {title}
           </Title>
@@ -79,7 +85,7 @@ export function PageHeader({
 
       {extra && <div style={{ marginTop: 8 }}>{extra}</div>}
 
-      {divider && <Divider style={{ margin: "16px 0" }} />}
+      {divider && <Divider style={{ margin: "12px 0 0 0" }} />}
     </div>
   );
 }

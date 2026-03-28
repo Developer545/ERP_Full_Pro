@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Avatar, Divider, Space, Typography } from "antd";
 import type { MenuProps } from "antd";
 import {
   DashboardOutlined,
@@ -32,8 +32,10 @@ import {
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { MENU_ITEMS, type MenuItemConfig } from "@/config/menu";
 import { APP_NAME } from "@/config/constants";
+import { useAuth } from "@/hooks/use-auth";
 
 const { Sider } = Layout;
+const { Text } = Typography;
 
 /** Mapa de nombre de icono a componente */
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -71,11 +73,13 @@ interface AppSidebarProps {
  * - Menu colapsable con iconos
  * - Resalta el item activo segun la URL
  * - Navega usando Next.js router
+ * - Gradiente oscuro azul/violeta con info de usuario en la parte inferior
  */
 export function AppSidebar({ tenantSlug }: AppSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { collapsed } = useSidebarStore();
+  const { user } = useAuth();
 
   /** Convierte MenuItemConfig[] a formato que acepta Ant Design Menu */
   const buildMenuItems = useCallback(
@@ -130,6 +134,16 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
     router.push(`/${tenantSlug}${key}`);
   };
 
+  /** Genera iniciales a partir del nombre del usuario */
+  const getUserInitials = (name?: string): string => {
+    if (!name) return "U";
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
+  const userInitials = getUserInitials(user?.name);
+
   return (
     <Sider
       collapsible
@@ -144,7 +158,10 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
         bottom: 0,
         zIndex: 100,
         overflow: "auto",
-        boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
+        boxShadow: "2px 0 12px rgba(0,0,0,0.25)",
+        background: "linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {/* Logo */}
@@ -155,27 +172,30 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
           alignItems: "center",
           justifyContent: collapsed ? "center" : "flex-start",
           padding: collapsed ? "0" : "0 20px",
-          borderBottom: "1px solid rgba(255,255,255,0.1)",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
           overflow: "hidden",
           transition: "all 0.2s",
+          flexShrink: 0,
         }}
       >
         <div
           style={{
             width: 32,
             height: 32,
-            background: "#1677ff",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             borderRadius: 8,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             color: "#fff",
             fontWeight: 700,
-            fontSize: 16,
+            fontSize: 13,
             flexShrink: 0,
+            letterSpacing: 0.5,
+            boxShadow: "0 2px 8px rgba(102,126,234,0.5)",
           }}
         >
-          E
+          ERP
         </div>
         {!collapsed && (
           <span
@@ -192,16 +212,79 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
         )}
       </div>
 
-      {/* Menu */}
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={[activeKey]}
-        defaultOpenKeys={defaultOpenKeys}
-        items={menuItems}
-        onClick={handleMenuClick}
-        style={{ borderRight: 0, marginTop: 8 }}
-      />
+      {/* Menu — crece para ocupar el espacio disponible */}
+      <div style={{ flex: 1, overflow: "auto" }}>
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[activeKey]}
+          defaultOpenKeys={defaultOpenKeys}
+          items={menuItems}
+          onClick={handleMenuClick}
+          style={{
+            borderRight: 0,
+            marginTop: 8,
+            background: "transparent",
+          }}
+        />
+      </div>
+
+      {/* Seccion de usuario en la parte inferior */}
+      <div style={{ flexShrink: 0 }}>
+        <Divider style={{ borderColor: "rgba(255,255,255,0.08)", margin: 0 }} />
+        <div
+          style={{
+            padding: collapsed ? "12px 0" : "12px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: collapsed ? "center" : "flex-start",
+            gap: 10,
+            transition: "all 0.2s",
+          }}
+        >
+          <Avatar
+            size={32}
+            src={user?.avatar}
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              flexShrink: 0,
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+          >
+            {!user?.avatar ? userInitials : undefined}
+          </Avatar>
+          {!collapsed && (
+            <Space direction="vertical" size={0} style={{ overflow: "hidden", flex: 1 }}>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  display: "block",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {user?.name ?? "Usuario"}
+              </Text>
+              <Text
+                style={{
+                  color: "rgba(255,255,255,0.45)",
+                  fontSize: 11,
+                  display: "block",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {user?.role ?? ""}
+              </Text>
+            </Space>
+          )}
+        </div>
+      </div>
     </Sider>
   );
 }

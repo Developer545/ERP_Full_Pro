@@ -1,6 +1,6 @@
 "use client";
 
-import { Layout, Button, Avatar, Dropdown, Badge, Space, Typography, Tooltip } from "antd";
+import { Layout, Button, Avatar, Dropdown, Badge, Space, Typography, Tooltip, Tag } from "antd";
 import type { MenuProps } from "antd";
 import {
   MenuFoldOutlined,
@@ -23,10 +23,39 @@ interface AppHeaderProps {
   tenantSlug: string;
 }
 
+/** Colores de avatar deterministas por inicial */
+const AVATAR_COLORS = [
+  "#1677ff", "#52c41a", "#fa8c16", "#722ed1",
+  "#eb2f96", "#13c2c2", "#fadb14", "#f5222d",
+];
+
+function getAvatarColor(name?: string): string {
+  if (!name) return AVATAR_COLORS[0];
+  const index = name.charCodeAt(0) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[index];
+}
+
+/** Genera iniciales a partir del nombre */
+function getUserInitials(name?: string): string {
+  if (!name) return "U";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
+
+/** Color del badge del plan */
+const PLAN_COLORS: Record<string, string> = {
+  FREE: "default",
+  BASIC: "blue",
+  PRO: "purple",
+  ENTERPRISE: "gold",
+};
+
 /**
  * Header principal del ERP.
  * - Toggle del sidebar
  * - Toggle de tema claro/oscuro
+ * - Badge del plan del tenant
  * - Notificaciones (placeholder)
  * - Menu de usuario con logout
  */
@@ -34,7 +63,11 @@ export function AppHeader({ tenantSlug: _tenantSlug }: AppHeaderProps) {
   const { collapsed, toggle } = useSidebarStore();
   const { isDark, toggle: toggleTheme } = useThemeStore();
   const sidebarWidth = collapsed ? 64 : 220;
-  const { user, logout, isLoggingOut } = useAuth();
+  const { user, tenant, logout, isLoggingOut } = useAuth();
+
+  const userInitials = getUserInitials(user?.name);
+  const avatarColor = getAvatarColor(user?.name);
+  const plan = (tenant?.plan as string | undefined) ?? "FREE";
 
   const userMenuItems: MenuProps["items"] = [
     {
@@ -78,17 +111,34 @@ export function AppHeader({ tenantSlug: _tenantSlug }: AppHeaderProps) {
         alignItems: "center",
         justifyContent: "space-between",
         boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+        borderBottom: "1px solid rgba(0,0,0,0.06)",
+        backdropFilter: "blur(10px)",
         transition: "left 0.2s",
         // Background se hereda del tema Ant Design (Layout.headerBg)
       }}
     >
-      {/* Izquierda: toggle sidebar */}
-      <Button
-        type="text"
-        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={toggle}
-        style={{ fontSize: 18 }}
-      />
+      {/* Izquierda: toggle sidebar + nombre del tenant y plan */}
+      <Space size={12} align="center">
+        <Button
+          type="text"
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={toggle}
+          style={{ fontSize: 18 }}
+        />
+        {tenant?.name && (
+          <Space size={8} align="center">
+            <Text strong style={{ fontSize: 14 }}>
+              {tenant.name}
+            </Text>
+            <Tag
+              color={PLAN_COLORS[plan] ?? "default"}
+              style={{ borderRadius: 12, fontSize: 10, lineHeight: "18px", padding: "0 8px", margin: 0 }}
+            >
+              {plan}
+            </Tag>
+          </Space>
+        )}
+      </Space>
 
       {/* Derecha: acciones */}
       <Space size={8}>
@@ -124,9 +174,11 @@ export function AppHeader({ tenantSlug: _tenantSlug }: AppHeaderProps) {
               <Avatar
                 size={32}
                 src={user?.avatar}
-                icon={!user?.avatar ? <UserOutlined /> : undefined}
-                style={{ backgroundColor: "#1677ff", cursor: "pointer" }}
-              />
+                icon={!user?.avatar && !user?.name ? <UserOutlined /> : undefined}
+                style={{ backgroundColor: avatarColor, cursor: "pointer", fontSize: 13, fontWeight: 600 }}
+              >
+                {!user?.avatar ? userInitials : undefined}
+              </Avatar>
               <Text strong style={{ fontSize: 13 }}>
                 {user?.name?.split(" ")[0] ?? "Usuario"}
               </Text>

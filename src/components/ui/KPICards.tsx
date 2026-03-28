@@ -21,6 +21,8 @@ export interface KPIItem {
   changeLabel?: string;
   /** Tooltip o descripcion adicional */
   description?: string;
+  /** Color de acento para el borde superior de la card */
+  color?: string;
 }
 
 interface KPICardsProps {
@@ -47,7 +49,7 @@ interface KPICardsProps {
  * @example
  * <KPICards
  *   items={[
- *     { title: "Ventas", value: "$12,340", icon: <DollarOutlined />, change: 12.5 },
+ *     { title: "Ventas", value: "$12,340", icon: <DollarOutlined />, change: 12.5, color: "#1677ff" },
  *     { title: "Clientes", value: "340", icon: <TeamOutlined />, change: -3.2 },
  *   ]}
  *   loading={isLoading}
@@ -63,7 +65,14 @@ export function KPICards({
       <Row gutter={[16, 16]}>
         {Array.from({ length: 4 }).map((_, i) => (
           <Col key={i} {...cols}>
-            <Card size="small" style={{ borderRadius: 10 }}>
+            <Card
+              size="small"
+              style={{
+                borderRadius: 12,
+                border: "none",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+              }}
+            >
               <Skeleton active paragraph={{ rows: 2 }} />
             </Card>
           </Col>
@@ -74,79 +83,98 @@ export function KPICards({
 
   return (
     <Row gutter={[16, 16]}>
-      {items.map((item) => (
-        <Col key={item.title} {...cols}>
-          <Card
-            size="small"
-            style={{ borderRadius: 10 }}
-            styles={{ body: { padding: 20 } }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              {/* Icono */}
+      {items.map((item) => {
+        const isPositive = (item.change ?? 0) >= 0;
+        const changeColor = isPositive ? "#52c41a" : "#ff4d4f";
+        const changeBg = isPositive ? "rgba(82,196,26,0.1)" : "rgba(255,77,79,0.1)";
+
+        return (
+          <Col key={item.title} {...cols}>
+            <Card
+              size="small"
+              style={{
+                borderRadius: 12,
+                border: "none",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                borderTop: item.color ? `3px solid ${item.color}` : undefined,
+              }}
+              styles={{ body: { padding: "16px 20px" } }}
+            >
+              {/* Header: titulo + icono */}
               <div
                 style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: 12,
-                  background: item.iconBg ?? "#e6f4ff",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  fontSize: 24,
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  marginBottom: 12,
                 }}
               >
-                {item.icon}
-              </div>
-
-              {/* Datos */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <Text
-                  type="secondary"
-                  style={{ fontSize: 12, display: "block" }}
-                >
+                <Text type="secondary" style={{ fontSize: 12 }}>
                   {item.title}
                 </Text>
-
-                <Title
-                  level={4}
-                  style={{ margin: "2px 0", lineHeight: 1.2 }}
+                {/* Icono en circulo */}
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: item.iconBg ?? "#e6f4ff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    fontSize: 18,
+                  }}
                 >
-                  {item.value}
-                </Title>
+                  {item.icon}
+                </div>
+              </div>
 
-                {item.change !== undefined && (
-                  <Text
+              {/* Valor principal */}
+              <Title
+                level={3}
+                style={{ margin: "0 0 8px 0", fontSize: 28, fontWeight: 700, lineHeight: 1 }}
+              >
+                {item.value}
+              </Title>
+
+              {/* Indicador de cambio */}
+              {item.change !== undefined && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span
                     style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 3,
+                      background: changeBg,
+                      color: changeColor,
+                      borderRadius: 20,
+                      padding: "2px 8px",
                       fontSize: 11,
-                      color: item.change >= 0 ? "#52c41a" : "#ff4d4f",
+                      fontWeight: 600,
                     }}
                   >
-                    {item.change >= 0 ? (
-                      <ArrowUpOutlined />
-                    ) : (
-                      <ArrowDownOutlined />
-                    )}{" "}
-                    {Math.abs(item.change)}%{" "}
-                    <Text type="secondary" style={{ fontSize: 11 }}>
-                      {item.changeLabel ?? "vs anterior"}
-                    </Text>
+                    {isPositive ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                    {Math.abs(item.change)}%
+                  </span>
+                  <Text type="secondary" style={{ fontSize: 11 }}>
+                    {item.changeLabel ?? "vs anterior"}
                   </Text>
-                )}
-              </div>
-            </div>
+                </div>
+              )}
 
-            {item.description && (
-              <Text
-                type="secondary"
-                style={{ fontSize: 11, marginTop: 8, display: "block" }}
-              >
-                {item.description}
-              </Text>
-            )}
-          </Card>
-        </Col>
-      ))}
+              {item.description && (
+                <Text
+                  type="secondary"
+                  style={{ fontSize: 11, marginTop: 8, display: "block" }}
+                >
+                  {item.description}
+                </Text>
+              )}
+            </Card>
+          </Col>
+        );
+      })}
     </Row>
   );
 }

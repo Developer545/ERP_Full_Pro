@@ -10,6 +10,7 @@ import {
   Typography,
   Row,
   Col,
+  Empty,
 } from "antd";
 import type { TableProps, TableColumnType } from "antd";
 import {
@@ -100,7 +101,7 @@ export function DataTable<T extends object>({
   actionSlot,
   searchPlaceholder = "Buscar...",
   loading = false,
-  emptyText = "No hay datos",
+  emptyText = "Sin registros",
   rowSelection,
   scrollX,
 }: DataTableProps<T>) {
@@ -191,7 +192,14 @@ export function DataTable<T extends object>({
         loading={loading}
         rowSelection={rowSelection}
         scroll={{ x: scrollX ?? "max-content" }}
-        locale={{ emptyText: <Text type="secondary">{emptyText}</Text> }}
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={<Text type="secondary">{emptyText}</Text>}
+            />
+          ),
+        }}
         pagination={
           onPageChange
             ? {
