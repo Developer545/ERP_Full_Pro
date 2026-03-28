@@ -22,7 +22,8 @@ export const POST = withApi(async (req) => {
 
       const arrayBuffer = await file.arrayBuffer();
       const wb = new ExcelJS.Workbook();
-      await wb.xlsx.load(Buffer.from(arrayBuffer));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await wb.xlsx.load(Buffer.from(arrayBuffer) as any);
       const ws = wb.worksheets[0];
 
       const rows: Array<Record<string, unknown>> = [];
