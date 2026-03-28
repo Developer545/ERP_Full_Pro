@@ -21,6 +21,7 @@ import { KPICards, type KPIItem } from "@/components/ui/KPICards";
 import { useDashboardKPIs } from "@/hooks/queries/use-dashboard";
 import { useAuth } from "@/hooks/use-auth";
 import { CURRENCY } from "@/config/constants";
+import { ICON_BG, COLOR } from "@/config/palette";
 
 const { Title, Text } = Typography;
 
@@ -70,6 +71,7 @@ function generarDatosEjemplo(): { dia: string; ventas: number }[] {
 
 /**
  * Dashboard Client — muestra KPIs reales y ultimas facturas.
+ * Todos los colores leen de PALETTE (via ICON_BG / COLOR) — sin hardcoding.
  */
 export function DashboardClient() {
   const { data: kpis, isLoading } = useDashboardKPIs();
@@ -103,7 +105,6 @@ export function DashboardClient() {
   /** Datos para la grafica de ventas — usa facturas reales si hay, sino ejemplo */
   const datosGrafica = useMemo(() => {
     if (kpis?.ultimasFacturas && kpis.ultimasFacturas.length > 0) {
-      // Agrupar facturas por dia de la ultima semana
       const hoy = new Date();
       const mapa: Record<string, number> = {};
       for (let i = 6; i >= 0; i--) {
@@ -127,38 +128,39 @@ export function DashboardClient() {
     return generarDatosEjemplo();
   }, [kpis?.ultimasFacturas]);
 
+  // KPIs — colores desde ICON_BG (lee de palette.ts)
   const kpiItems: KPIItem[] = [
     {
       title: "Ventas del Mes",
       value: isLoading ? "..." : formatCurrency(kpis?.ventasMes ?? 0),
-      icon: <DollarOutlined style={{ color: "#1677ff" }} />,
-      iconBg: "#e6f4ff",
+      icon: <DollarOutlined style={{ color: ICON_BG.primary.color }} />,
+      iconBg: ICON_BG.primary.bg,
       change: kpis ? calcChange(kpis.ventasMes, kpis.ventasMesAnterior) : undefined,
       changeLabel: "vs mes anterior",
-      color: "#1677ff",
+      color: ICON_BG.primary.color,
     },
     {
       title: "Facturas del Mes",
       value: isLoading ? "..." : kpis?.facturasMes ?? 0,
-      icon: <FileTextOutlined style={{ color: "#52c41a" }} />,
-      iconBg: "#f6ffed",
+      icon: <FileTextOutlined style={{ color: ICON_BG.success.color }} />,
+      iconBg: ICON_BG.success.bg,
       change: kpis ? calcChange(kpis.facturasMes, kpis.facturasMesAnterior) : undefined,
       changeLabel: "vs mes anterior",
-      color: "#52c41a",
+      color: ICON_BG.success.color,
     },
     {
       title: "Clientes Activos",
       value: isLoading ? "..." : kpis?.clientesActivos ?? 0,
-      icon: <TeamOutlined style={{ color: "#fa8c16" }} />,
-      iconBg: "#fff7e6",
-      color: "#fa8c16",
+      icon: <TeamOutlined style={{ color: ICON_BG.orange.color }} />,
+      iconBg: ICON_BG.orange.bg,
+      color: ICON_BG.orange.color,
     },
     {
       title: "Productos en Stock",
       value: isLoading ? "..." : kpis?.productosStock ?? 0,
-      icon: <ShoppingOutlined style={{ color: "#722ed1" }} />,
-      iconBg: "#f9f0ff",
-      color: "#722ed1",
+      icon: <ShoppingOutlined style={{ color: ICON_BG.purple.color }} />,
+      iconBg: ICON_BG.purple.bg,
+      color: ICON_BG.purple.color,
     },
   ];
 
@@ -194,8 +196,8 @@ export function DashboardClient() {
               >
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1677ff" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#1677ff" stopOpacity={0} />
+                    <stop offset="5%"  stopColor={COLOR.primary} stopOpacity={0.25} />
+                    <stop offset="95%" stopColor={COLOR.primary} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
@@ -220,10 +222,10 @@ export function DashboardClient() {
                 <Area
                   type="monotone"
                   dataKey="ventas"
-                  stroke="#1677ff"
-                  strokeWidth={2}
+                  stroke={COLOR.primary}
+                  strokeWidth={2.5}
                   fill="url(#salesGradient)"
-                  dot={{ r: 3, fill: "#1677ff", strokeWidth: 0 }}
+                  dot={{ r: 3, fill: COLOR.primary, strokeWidth: 0 }}
                   activeDot={{ r: 5 }}
                 />
               </AreaChart>
@@ -272,7 +274,7 @@ export function DashboardClient() {
                     key: "total",
                     align: "right" as const,
                     render: (total: number) => (
-                      <Text strong style={{ color: "#52c41a" }}>
+                      <Text strong style={{ color: COLOR.success }}>
                         {formatCurrency(Number(total))}
                       </Text>
                     ),

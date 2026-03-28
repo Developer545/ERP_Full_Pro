@@ -62,7 +62,7 @@ export function PageHeader({
         {/* Titulo con acento izquierdo */}
         <div
           style={{
-            borderLeft: "3px solid #1677ff",
+            borderLeft: "3px solid var(--color-primary)",
             paddingLeft: 12,
           }}
         >

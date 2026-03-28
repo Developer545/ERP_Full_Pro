@@ -1,7 +1,9 @@
 import type { ThemeConfig } from "antd";
+import { PALETTE } from "./palette";
 
 /**
- * Tokens base compartidos entre temas
+ * Tokens base compartidos entre temas.
+ * Todos los colores leen de PALETTE — editar palette.ts para cambiar la paleta.
  */
 const baseTokens = {
   borderRadius: 10,
@@ -9,10 +11,10 @@ const baseTokens = {
   fontFamily:
     "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   fontSize: 14,
-  colorPrimary: "#1677ff",
-  colorSuccess: "#52c41a",
-  colorWarning: "#faad14",
-  colorError: "#ff4d4f",
+  colorPrimary:  PALETTE.primary,
+  colorSuccess:  PALETTE.success,
+  colorWarning:  PALETTE.warning,
+  colorError:    PALETTE.error,
 };
 
 /**
@@ -21,22 +23,20 @@ const baseTokens = {
 export const lightTheme: ThemeConfig = {
   token: {
     ...baseTokens,
-    colorBgContainer: "#ffffff",
-    colorBgLayout: "#f5f5f5",
-    colorBgElevated: "#ffffff",
-    colorBorder: "#e8e8e8",
-    colorText: "rgba(0,0,0,0.88)",
-    colorTextSecondary: "rgba(0,0,0,0.45)",
+    colorBgContainer:    PALETTE.bgContainer,
+    colorBgLayout:       PALETTE.bgLayout,
+    colorBgElevated:     PALETTE.bgElevated,
+    colorBorder:         PALETTE.border,
+    colorText:           PALETTE.textPrimary,
+    colorTextSecondary:  PALETTE.textSecondary,
   },
   components: {
     Table: {
-      // size se aplica como prop en cada <Table size="small" />, no como token
-      headerBg: "#fafafa",
-      rowHoverBg: "#f5f5f5",
-      borderColor: "#e8e8e8",
+      headerBg:    "#fafafa",
+      rowHoverBg:  "#f5f5f5",
+      borderColor: PALETTE.border,
     },
     Card: {
-      // size se aplica como prop en cada <Card size="small" />, no como token
       paddingLG: 16,
     },
     Button: {
@@ -52,14 +52,14 @@ export const lightTheme: ThemeConfig = {
       controlHeight: 36,
     },
     Layout: {
-      headerBg: "#ffffff",
-      siderBg: "#001529",
-      triggerBg: "#002140",
+      headerBg:  PALETTE.bgContainer,
+      siderBg:   "#1a1a2e",
+      triggerBg: "#16213e",
     },
     Menu: {
-      darkItemBg: "#001529",
-      darkSubMenuItemBg: "#000c17",
-      darkItemSelectedBg: "#1677ff",
+      darkItemBg:         "#1a1a2e",
+      darkSubMenuItemBg:  "#16213e",
+      darkItemSelectedBg: PALETTE.primary,
     },
   },
 };
@@ -70,22 +70,20 @@ export const lightTheme: ThemeConfig = {
 export const darkTheme: ThemeConfig = {
   token: {
     ...baseTokens,
-    colorBgContainer: "#161b22",
-    colorBgLayout: "#0d1117",
-    colorBgElevated: "#1c2128",
-    colorBorder: "#30363d",
-    colorText: "rgba(255,255,255,0.88)",
-    colorTextSecondary: "rgba(255,255,255,0.45)",
+    colorBgContainer:    PALETTE.darkBgContainer,
+    colorBgLayout:       PALETTE.darkBgLayout,
+    colorBgElevated:     PALETTE.darkBgElevated,
+    colorBorder:         PALETTE.darkBorder,
+    colorText:           PALETTE.darkText,
+    colorTextSecondary:  PALETTE.darkTextSec,
   },
   components: {
     Table: {
-      // size se aplica como prop en cada <Table size="small" />, no como token
-      headerBg: "#1c2128",
-      rowHoverBg: "#1c2128",
-      borderColor: "#30363d",
+      headerBg:    PALETTE.darkBgElevated,
+      rowHoverBg:  PALETTE.darkBgElevated,
+      borderColor: PALETTE.darkBorder,
     },
     Card: {
-      // size se aplica como prop en cada <Card size="small" />, no como token
       paddingLG: 16,
     },
     Button: {
@@ -101,14 +99,14 @@ export const darkTheme: ThemeConfig = {
       controlHeight: 36,
     },
     Layout: {
-      headerBg: "#161b22",
-      siderBg: "#0d1117",
-      triggerBg: "#0d1117",
+      headerBg:  PALETTE.darkBgContainer,
+      siderBg:   PALETTE.darkBgLayout,
+      triggerBg: PALETTE.darkBgLayout,
     },
     Menu: {
-      darkItemBg: "#0d1117",
-      darkSubMenuItemBg: "#000000",
-      darkItemSelectedBg: "#1677ff",
+      darkItemBg:         PALETTE.darkBgLayout,
+      darkSubMenuItemBg:  "#000000",
+      darkItemSelectedBg: PALETTE.primary,
     },
   },
 };

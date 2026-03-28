@@ -2,48 +2,73 @@
 @import "tailwindcss/utilities";
 /* Nota: preflight (reset CSS) omitido para no conflictuar con Ant Design */
 
-/* Variables de tema global */
+/* ═══════════════════════════════════════════════════════════════════════════
+   VARIABLES CSS GLOBALES — sincronizadas con src/config/palette.ts
+   Para cambiar la paleta: editar palette.ts Y las variables de abajo.
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  --primary: #1677ff;
-  --bg-layout: #f5f5f5;
-  --bg-container: #ffffff;
-  --border-color: #e8e8e8;
-  --text-primary: rgba(0, 0, 0, 0.88);
-  --text-secondary: rgba(0, 0, 0, 0.45);
+  /* Primario (Amber/Dorado) */
+  --color-primary:        #d4a017;
+  --color-primary-hover:  #b8880f;
+  --color-primary-light:  #fdf6e3;
+  --color-primary-dark:   #a07510;
+
+  /* Semanticos */
+  --color-success:        #52c41a;
+  --color-success-light:  #f6ffed;
+  --color-warning:        #faad14;
+  --color-warning-light:  #fffbe6;
+  --color-error:          #ff4d4f;
+  --color-error-light:    #fff1f0;
+  --color-info:           #1677ff;
+  --color-info-light:     #e6f4ff;
+
+  /* Sidebar */
+  --sidebar-bg:           linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --logo-gradient:        linear-gradient(135deg, #d4a017 0%, #a07510 100%);
+
+  /* Layout — modo claro */
+  --bg-layout:            #f5f5f5;
+  --bg-container:         #ffffff;
+  --bg-elevated:          #ffffff;
+  --border-color:         #e8e8e8;
+  --text-primary:         rgba(0, 0, 0, 0.88);
+  --text-secondary:       rgba(0, 0, 0, 0.45);
 }
 
+/* Modo oscuro */
 [data-theme="dark"] {
-  --bg-layout: #0d1117;
-  --bg-container: #161b22;
-  --border-color: #30363d;
-  --text-primary: rgba(255, 255, 255, 0.88);
-  --text-secondary: rgba(255, 255, 255, 0.45);
+  --bg-layout:            #0d1117;
+  --bg-container:         #161b22;
+  --bg-elevated:          #1c2128;
+  --border-color:         #30363d;
+  --text-primary:         rgba(255, 255, 255, 0.88);
+  --text-secondary:       rgba(255, 255, 255, 0.45);
 }
 
-/* Scroll personalizado */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #bfbfbf;
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCROLL PERSONALIZADO
+   ═══════════════════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
 
-/* Ant Design overrides globales */
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANT DESIGN OVERRIDES GLOBALES
+   ═══════════════════════════════════════════════════════════════════════════ */
 .ant-table-wrapper .ant-table-thead > tr > th {
   font-weight: 600;
 }
 
-/* Print styles para tickets/facturas */
+/* Seleccion de filas con el color primario */
+.ant-table-wrapper .ant-table-row-selected > td {
+  background-color: var(--color-primary-light) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRINT — Tickets / Facturas
+   ═══════════════════════════════════════════════════════════════════════════ */
 @media print {
-  .no-print {
-    display: none !important;
-  }
+  .no-print { display: none !important; }
 }

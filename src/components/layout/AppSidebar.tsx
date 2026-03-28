@@ -159,7 +159,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
         zIndex: 100,
         overflow: "auto",
         boxShadow: "2px 0 12px rgba(0,0,0,0.25)",
-        background: "linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+        background: "var(--sidebar-bg)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -182,7 +182,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
           style={{
             width: 32,
             height: 32,
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "var(--logo-gradient)",
             borderRadius: 8,
             display: "flex",
             alignItems: "center",
@@ -192,7 +192,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
             fontSize: 13,
             flexShrink: 0,
             letterSpacing: 0.5,
-            boxShadow: "0 2px 8px rgba(102,126,234,0.5)",
+            boxShadow: "0 2px 8px rgba(212,160,23,0.4)",
           }}
         >
           ERP
@@ -246,7 +246,7 @@ export function AppSidebar({ tenantSlug }: AppSidebarProps) {
             size={32}
             src={user?.avatar}
             style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "var(--logo-gradient)",
               flexShrink: 0,
               fontSize: 13,
               fontWeight: 600,

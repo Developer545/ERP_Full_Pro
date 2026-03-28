@@ -85,7 +85,7 @@ export function KPICards({
     <Row gutter={[16, 16]}>
       {items.map((item) => {
         const isPositive = (item.change ?? 0) >= 0;
-        const changeColor = isPositive ? "#52c41a" : "#ff4d4f";
+        const changeColor = isPositive ? "var(--color-success)" : "var(--color-error)";
         const changeBg = isPositive ? "rgba(82,196,26,0.1)" : "rgba(255,77,79,0.1)";
 
         return (
