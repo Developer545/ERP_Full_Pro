@@ -31,7 +31,7 @@ import {
   useDeleteEmpleado,
 } from "@/hooks/queries/use-empleados";
 import type { EmpleadoRow } from "@/modules/empleados/empleado.types";
-import type { CreateEmpleadoDto } from "@/modules/empleados/empleado.schema";
+import type { CreateEmpleadoDto, UpdateEmpleadoDto } from "@/modules/empleados/empleado.schema";
 import type { EmpleadoFormValues } from "./EmpleadoForm";
 import { CURRENCY } from "@/config/constants";
 
@@ -385,7 +385,7 @@ export function EmpleadosClient() {
               ? editItem.fechaIngreso.split("T")[0]
               : "",
             tipoContrato: (editItem?.tipoContrato as CreateEmpleadoDto["tipoContrato"]) ?? "INDEFINIDO",
-            estado: editItem?.estado,
+            estado: (editItem?.estado as UpdateEmpleadoDto["estado"]) ?? "ACTIVO",
             salarioBase: Number(editItem?.salarioBase) || 0,
             tipoAFP: (editItem?.tipoAFP as CreateEmpleadoDto["tipoAFP"]) ?? "CONFÍA",
             exentoISS: editItem?.exentoISS ?? false,

@@ -47,7 +47,7 @@ async function fetchEmpleadosActivos() {
   return json.data;
 }
 
-async function createEmpleado(data: CreateEmpleadoDto) {
+async function createEmpleado(data: CreateEmpleadoDto | Record<string, unknown>) {
   const res = await fetch(BASE_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -63,7 +63,7 @@ async function updateEmpleado({
   data,
 }: {
   id: string;
-  data: UpdateEmpleadoDto;
+  data: UpdateEmpleadoDto | Record<string, unknown>;
 }) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "PUT",

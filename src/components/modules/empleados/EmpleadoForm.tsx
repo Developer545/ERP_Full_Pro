@@ -16,7 +16,6 @@ import {
   TIPOS_CONTRATO,
   TIPOS_AFP,
   ESTADOS_EMPLEADO,
-  type CreateEmpleadoDto,
 } from "@/modules/empleados/empleado.schema";
 import { z } from "zod";
 import { FormSection } from "@/components/ui/FormSection";
