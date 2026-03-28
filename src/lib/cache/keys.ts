@@ -49,6 +49,35 @@ export const categoriaKeys = {
   prefix: (tenantId: string) => `t:${tenantId}:categorias:`,
 };
 
+/** Facturas */
+export const facturaKeys = {
+  list: (tenantId: string, params: string) =>
+    `t:${tenantId}:facturas:list:${params}`,
+  detail: (tenantId: string, id: string) =>
+    `t:${tenantId}:facturas:${id}`,
+  resumenMes: (tenantId: string) => `t:${tenantId}:facturas:resumen-mes`,
+  prefix: (tenantId: string) => `t:${tenantId}:facturas:`,
+};
+
+/** Inventario / Kardex */
+export const inventarioKeys = {
+  movimientos: (tenantId: string, params: string) =>
+    `t:${tenantId}:inventario:list:${params}`,
+  stock: (tenantId: string) => `t:${tenantId}:inventario:stock`,
+  kardex: (tenantId: string, productId: string) =>
+    `t:${tenantId}:inventario:kardex:${productId}`,
+  prefix: (tenantId: string) => `t:${tenantId}:inventario:`,
+};
+
+/** Cuentas por Cobrar (CxC) */
+export const cxcKeys = {
+  list: (tenantId: string, params: string) =>
+    `t:${tenantId}:cxc:list:${params}`,
+  detail: (tenantId: string, id: string) => `t:${tenantId}:cxc:${id}`,
+  resumen: (tenantId: string) => `t:${tenantId}:cxc:resumen`,
+  prefix: (tenantId: string) => `t:${tenantId}:cxc:`,
+};
+
 /** Permisos de usuario */
 export const authKeys = {
   userPermissions: (userId: string) => `user:${userId}:permissions`,
