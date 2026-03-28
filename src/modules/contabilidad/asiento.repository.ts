@@ -15,13 +15,14 @@ const LINES_INCLUDE = {
 export const AsientoRepository = {
   async findAll(filtros: AsientoFiltros) {
     const tenantId = getCurrentTenantId();
-    const { search, estado, desde, hasta, origen, page = 1, pageSize = 20 } = filtros;
+    const { search, estado, desde, hasta, origen, periodoId, page = 1, pageSize = 20 } = filtros;
 
     const where: Prisma.JournalEntryWhereInput = {
       tenantId,
       isActive: true,
       ...(estado && { estado }),
       ...(origen && { origen }),
+      ...(periodoId && { periodoId }),
       ...(search && { concepto: { contains: search, mode: "insensitive" } }),
       ...((desde || hasta) && {
         fecha: {
@@ -81,6 +82,8 @@ export const AsientoRepository = {
         anio,
         fecha,
         concepto: data.concepto,
+        tipo: data.tipo ?? "DIARIO",
+        periodoId: data.periodoId ?? null,
         origen: data.origen ?? "MANUAL",
         origenId: data.origenId ?? null,
         totalDebe,

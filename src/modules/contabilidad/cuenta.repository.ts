@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma/client";
 import { getCurrentTenantId, getCurrentUserId } from "@/lib/tenant/context";
 import type { Prisma } from "@prisma/client";
 import type { CuentaFiltros, CreateCuentaInput, UpdateCuentaInput } from "./cuenta.types";
+import type { TipoCuenta, NaturalezaCuenta } from "@prisma/client";
 
 const CUENTA_SELECT = {
   id: true,
@@ -105,5 +106,59 @@ export const CuentaRepository = {
   async tieneMovimientos(id: string) {
     const count = await prisma.journalLine.count({ where: { accountId: id } });
     return count > 0;
+  },
+
+  /** Importación masiva: crea cuentas que no existan (skip duplicadas) */
+  async bulkCreate(
+    rows: Array<{
+      codigo: string;
+      nombre: string;
+      tipo: TipoCuenta;
+      naturaleza: NaturalezaCuenta;
+      nivel: number;
+      permiteMovimiento: boolean;
+    }>
+  ) {
+    const tenantId = getCurrentTenantId();
+    const userId = getCurrentUserId();
+    let importadas = 0;
+    const errores: Array<{ fila: number; codigo: string; error: string }> = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      try {
+        await prisma.accountChart.upsert({
+          where: { tenantId_codigo: { tenantId, codigo: row.codigo } },
+          create: {
+            tenantId,
+            codigo: row.codigo,
+            nombre: row.nombre,
+            tipo: row.tipo,
+            naturaleza: row.naturaleza,
+            nivel: row.nivel,
+            permiteMovimiento: row.permiteMovimiento,
+            isActive: true,
+            createdBy: userId,
+            updatedBy: userId,
+          },
+          update: {},
+        });
+        importadas++;
+      } catch (e) {
+        errores.push({
+          fila: i + 1,
+          codigo: row.codigo,
+          error: e instanceof Error ? e.message : "Error desconocido",
+        });
+      }
+    }
+
+    return { importadas, errores };
+  },
+
+  /** Verifica si el tenant ya tiene cuentas cargadas */
+  async count() {
+    const tenantId = getCurrentTenantId();
+    return prisma.accountChart.count({ where: { tenantId, isActive: true } });
   },
 };

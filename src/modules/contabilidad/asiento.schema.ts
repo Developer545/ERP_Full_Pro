@@ -12,6 +12,8 @@ export const createAsientoSchema = z
   .object({
     fecha: z.string().min(1),
     concepto: z.string().min(1).max(500),
+    tipo: z.string().max(50).optional().default("DIARIO"),
+    periodoId: z.string().nullable().optional(),
     origen: z
       .enum(["MANUAL", "FACTURA_DTE", "COMPRA", "PLANILLA", "GASTO", "AGUINALDO"])
       .optional()
@@ -31,6 +33,8 @@ export const createAsientoSchema = z
 export const updateAsientoSchema = z.object({
   fecha: z.string().min(1).optional(),
   concepto: z.string().min(1).max(500).optional(),
+  tipo: z.string().max(50).optional(),
+  periodoId: z.string().nullable().optional(),
   lines: z.array(lineaSchema).min(2).optional(),
 });
 
@@ -42,6 +46,7 @@ export const filterAsientosSchema = z.object({
   origen: z
     .enum(["MANUAL", "FACTURA_DTE", "COMPRA", "PLANILLA", "GASTO", "AGUINALDO"])
     .optional(),
+  periodoId: z.string().optional(),
   page: z
     .string()
     .optional()

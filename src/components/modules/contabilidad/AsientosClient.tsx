@@ -15,14 +15,13 @@ import {
   useAnularAsiento,
 } from "@/hooks/queries/use-asientos";
 import { useCuentas } from "@/hooks/queries/use-cuentas";
+import { usePeriodos } from "@/hooks/queries/use-periodos";
+import { useTiposAsiento } from "@/hooks/queries/use-tipos-asiento";
 import type { AsientoFiltros } from "@/modules/contabilidad/asiento.types";
 
 const ESTADO_COLOR: Record<string, string> = {
-  BORRADOR:  "gold",
-  PUBLICADO: "green",
-  ANULADO:   "red",
+  BORRADOR: "gold", PUBLICADO: "green", ANULADO: "red",
 };
-
 const ESTADO_LABEL: Record<string, string> = {
   BORRADOR: "Borrador", PUBLICADO: "Publicado", ANULADO: "Anulado",
 };
@@ -34,18 +33,26 @@ export function AsientosClient() {
 
   const { data, isLoading } = useAsientos(filtros);
   const { data: cuentasData } = useCuentas({ soloMovimiento: true, pageSize: 500 });
-  const cuentas = cuentasData?.data ?? [];
+  const { data: periodosData } = usePeriodos({ estado: "ABIERTO", pageSize: 100 });
+  const { data: tiposData } = useTiposAsiento();
 
-  const createMutation  = useCreateAsiento();
-  const updateMutation  = useUpdateAsiento();
-  const publicarMut     = usePublicarAsiento();
-  const anularMut       = useAnularAsiento();
+  const cuentas = cuentasData?.data ?? [];
+  const periodos: Array<{ id: string; nombre: string }> = periodosData?.data ?? [];
+  const tipos: Array<{ id: string; nombre: string; color: string }> = tiposData?.data ?? [];
+
+  const createMutation = useCreateAsiento();
+  const updateMutation = useUpdateAsiento();
+  const publicarMut = usePublicarAsiento();
+  const anularMut = useAnularAsiento();
 
   const items: Array<Record<string, unknown>> = data?.data ?? [];
 
   const openNew = () => {
     form.resetFields();
-    form.setFieldsValue({ lines: [{ debe: 0, haber: 0 }, { debe: 0, haber: 0 }] });
+    form.setFieldsValue({
+      tipo: "DIARIO",
+      lines: [{ debe: 0, haber: 0 }, { debe: 0, haber: 0 }],
+    });
     setModal({ open: true });
   };
 
@@ -82,6 +89,16 @@ export function AsientosClient() {
       key: "fecha",
       width: 110,
       render: (v: string) => dayjs(v).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Tipo",
+      dataIndex: "tipo",
+      key: "tipo",
+      width: 90,
+      render: (v: string) => {
+        const t = tipos.find((t) => t.nombre === v);
+        return <Tag color={t?.color ?? "blue"}>{v}</Tag>;
+      },
     },
     { title: "Concepto", dataIndex: "concepto", key: "concepto" },
     {
@@ -120,7 +137,10 @@ export function AsientosClient() {
               </Tooltip>
               <Popconfirm
                 title="¿Publicar este asiento? No se podrá editar después."
-                onConfirm={() => publicarMut.mutate(record.id as string, { onSuccess: () => message.success("Asiento publicado") })}
+                onConfirm={() => publicarMut.mutate(record.id as string, {
+                  onSuccess: () => message.success("Asiento publicado"),
+                  onError: (e) => message.error(e.message),
+                })}
               >
                 <Tooltip title="Publicar">
                   <Button size="small" type="primary" icon={<CheckCircleOutlined />} />
@@ -131,7 +151,10 @@ export function AsientosClient() {
           {record.estado === "PUBLICADO" && (
             <Popconfirm
               title="¿Anular este asiento?"
-              onConfirm={() => anularMut.mutate(record.id as string, { onSuccess: () => message.success("Asiento anulado") })}
+              onConfirm={() => anularMut.mutate(record.id as string, {
+                onSuccess: () => message.success("Asiento anulado"),
+                onError: (e) => message.error(e.message),
+              })}
             >
               <Tooltip title="Anular">
                 <Button size="small" danger icon={<StopOutlined />} />
@@ -156,6 +179,13 @@ export function AsientosClient() {
               options={Object.entries(ESTADO_LABEL).map(([v, l]) => ({ value: v, label: l }))}
               onChange={(v) => setFiltros((f) => ({ ...f, estado: v, page: 1 }))}
             />
+            <Select
+              allowClear
+              placeholder="Período"
+              style={{ width: 160 }}
+              options={periodos.map((p) => ({ value: p.id, label: p.nombre }))}
+              onChange={(v) => setFiltros((f) => ({ ...f, periodoId: v, page: 1 }))}
+            />
             <DatePicker.RangePicker
               size="small"
               format="DD/MM/YYYY"
@@ -168,9 +198,7 @@ export function AsientosClient() {
                 }))
               }
             />
-            <Button type="primary" icon={<PlusOutlined />} onClick={openNew}>
-              Nuevo asiento
-            </Button>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openNew}>Nuevo asiento</Button>
           </Space>
         }
       />
@@ -194,10 +222,16 @@ export function AsientosClient() {
         onOk={handleOk}
         onCancel={() => setModal({ open: false })}
         confirmLoading={createMutation.isPending || updateMutation.isPending}
-        width={820}
+        width={860}
         destroyOnClose
       >
-        <AsientoForm form={form} cuentas={cuentas} initialValues={modal.editing} />
+        <AsientoForm
+          form={form}
+          cuentas={cuentas}
+          periodos={periodos}
+          tipos={tipos}
+          initialValues={modal.editing}
+        />
       </Modal>
     </>
   );

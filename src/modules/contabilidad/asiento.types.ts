@@ -6,6 +6,7 @@ export interface AsientoFiltros {
   desde?: string;
   hasta?: string;
   origen?: OrigenAsiento;
+  periodoId?: string;
   page?: number;
   pageSize?: number;
 }
@@ -21,6 +22,8 @@ export interface CreateLineaInput {
 export interface CreateAsientoInput {
   fecha: string;
   concepto: string;
+  tipo?: string;
+  periodoId?: string | null;
   origen?: OrigenAsiento;
   origenId?: string | null;
   lines: CreateLineaInput[];

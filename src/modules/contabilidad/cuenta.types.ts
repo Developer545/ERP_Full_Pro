@@ -21,3 +21,17 @@ export interface CreateCuentaInput {
 }
 
 export type UpdateCuentaInput = Partial<CreateCuentaInput>;
+
+export interface ImportarCuentaRow {
+  codigo: string;
+  nombre: string;
+  tipo: string;
+  naturaleza: string;
+  nivel: number;
+  permiteMovimiento: boolean;
+}
+
+export interface ImportarResult {
+  importadas: number;
+  errores: Array<{ fila: number; codigo: string; error: string }>;
+}

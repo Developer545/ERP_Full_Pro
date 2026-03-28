@@ -13,6 +13,7 @@ export const GET = withApi(async (req) => {
       desde: url.searchParams.get("desde") ?? undefined,
       hasta: url.searchParams.get("hasta") ?? undefined,
       origen: url.searchParams.get("origen") ?? undefined,
+      periodoId: url.searchParams.get("periodoId") ?? undefined,
       page: url.searchParams.get("page") ?? undefined,
       pageSize: url.searchParams.get("pageSize") ?? undefined,
     });

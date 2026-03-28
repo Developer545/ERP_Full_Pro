@@ -76,3 +76,40 @@ export function useDeleteCuenta() {
     onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
   });
 }
+
+export function useImportarCuentas() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: FormData | unknown[]) => {
+      let res: Response;
+      if (payload instanceof FormData) {
+        // Archivo Excel — multipart
+        res = await fetch("/api/v1/cuentas/importar", { method: "POST", body: payload });
+      } else {
+        // JSON directo
+        res = await fetch("/api/v1/cuentas/importar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rows: payload }),
+        });
+      }
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error?.message ?? "Error al importar");
+      return json;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}
+
+export function useImportarCatalogoEstandar() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/v1/cuentas/estandar", { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error?.message ?? "Error al importar catálogo");
+      return json;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: [KEY] }),
+  });
+}

@@ -927,10 +927,20 @@ model PlanillaDetalle {
 enum TipoCuenta {
   ACTIVO
   PASIVO
-  CAPITAL
+  CAPITAL       // Patrimonio neto / Capital contable
+  PATRIMONIO    // Alias contable formal de CAPITAL
   INGRESO
   COSTO
   GASTO
+  CIERRE        // Cuentas de cierre del ejercicio
+  ORDEN_DEUDORA   // Cuentas de orden deudora (memorandum)
+  ORDEN_ACREEDORA // Cuentas de orden acreedora (memorandum)
+}
+
+/// Estado del período contable
+enum EstadoPeriodo {
+  ABIERTO  // Acepta nuevos asientos
+  CERRADO  // Bloqueado — no acepta asientos
 }
 
 /// Naturaleza del saldo de la cuenta
@@ -974,6 +984,7 @@ model AccountChart {
   notas     String?
 
   lines     JournalLine[]
+  balances  AccountBalance[]
 
   isActive  Boolean  @default(true)
   deletedAt DateTime?
@@ -997,9 +1008,14 @@ model JournalEntry {
   anio      Int
   fecha     DateTime
   concepto  String
+  tipo      String   @default("DIARIO") // DIARIO, AJUSTE, CIERRE, APERTURA
   estado    EstadoAsiento     @default(BORRADOR)
   origen    OrigenAsiento     @default(MANUAL)
   origenId  String?           // ID del documento origen (invoiceId, purchaseOrderId, etc.)
+
+  // Período contable al que pertenece (opcional para compatibilidad)
+  periodoId String?
+  periodo   AccountingPeriod? @relation(fields: [periodoId], references: [id])
 
   totalDebe  Decimal @db.Decimal(14, 2) @default(0)
   totalHaber Decimal @db.Decimal(14, 2) @default(0)
@@ -1018,6 +1034,7 @@ model JournalEntry {
   @@index([tenantId, fecha])
   @@index([tenantId, estado])
   @@index([tenantId, origen, origenId])
+  @@index([tenantId, periodoId])
   @@map("journal_entries")
 }
 
@@ -1039,4 +1056,73 @@ model JournalLine {
   @@index([entryId])
   @@index([accountId])
   @@map("journal_lines")
+}
+
+/// Período contable mensual (controla qué meses aceptan asientos)
+model AccountingPeriod {
+  id         String         @id @default(cuid())
+  tenantId   String
+
+  nombre     String         // "Enero 2026"
+  anio       Int
+  mes        Int            // 1-12
+  fechaInicio DateTime
+  fechaFin    DateTime
+  estado     EstadoPeriodo  @default(ABIERTO)
+
+  entries    JournalEntry[]
+  balances   AccountBalance[]
+
+  isActive   Boolean  @default(true)
+  deletedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String?
+  updatedBy  String?
+
+  @@unique([tenantId, anio, mes])
+  @@index([tenantId, isActive])
+  @@index([tenantId, estado])
+  @@map("accounting_periods")
+}
+
+/// Saldo acumulado por cuenta en cada período (desnormalizado para reportes rápidos)
+model AccountBalance {
+  id          String  @id @default(cuid())
+  tenantId    String
+
+  accountId   String
+  account     AccountChart     @relation(fields: [accountId], references: [id])
+  periodoId   String
+  periodo     AccountingPeriod @relation(fields: [periodoId], references: [id])
+
+  saldoAnterior Decimal @db.Decimal(14, 2) @default(0)
+  debitos       Decimal @db.Decimal(14, 2) @default(0)
+  creditos      Decimal @db.Decimal(14, 2) @default(0)
+  saldoFinal    Decimal @db.Decimal(14, 2) @default(0)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([accountId, periodoId])
+  @@index([tenantId])
+  @@index([tenantId, periodoId])
+  @@map("account_balances")
+}
+
+/// Tipos de asiento configurables por tenant
+model JournalType {
+  id       String  @id @default(cuid())
+  tenantId String?  // null = predefinido del sistema; String = personalizado por tenant
+
+  nombre   String   // DIARIO, AJUSTE, CIERRE, APERTURA, o personalizado
+  color    String   @default("blue")
+  activo   Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, nombre])
+  @@index([tenantId])
+  @@map("journal_types")
 }
