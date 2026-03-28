@@ -6,15 +6,16 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   BellOutlined,
-  SunOutlined,
-  MoonOutlined,
+  BgColorsOutlined,
   UserOutlined,
   LogoutOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { useState } from "react";
 import { useThemeStore } from "@/stores/theme-store";
 import { useSidebarStore } from "@/stores/sidebar-store";
 import { useAuth } from "@/hooks/use-auth";
+import ThemeSelector from "@/components/ui/ThemeSelector";
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -61,7 +62,8 @@ const PLAN_COLORS: Record<string, string> = {
  */
 export function AppHeader({ tenantSlug: _tenantSlug }: AppHeaderProps) {
   const { collapsed, toggle } = useSidebarStore();
-  const { isDark, toggle: toggleTheme } = useThemeStore();
+  useThemeStore(); // suscripción para re-render al cambiar tema
+  const [themeSelectorOpen, setThemeSelectorOpen] = useState(false);
   const sidebarWidth = collapsed ? 64 : 220;
   const { user, tenant, logout, isLoggingOut } = useAuth();
 
@@ -142,15 +144,20 @@ export function AppHeader({ tenantSlug: _tenantSlug }: AppHeaderProps) {
 
       {/* Derecha: acciones */}
       <Space size={8}>
-        {/* Toggle tema */}
-        <Tooltip title={isDark ? "Modo claro" : "Modo oscuro"}>
+        {/* Selector de temas */}
+        <Tooltip title="Apariencia y temas">
           <Button
             type="text"
-            icon={isDark ? <SunOutlined /> : <MoonOutlined />}
-            onClick={toggleTheme}
+            icon={<BgColorsOutlined />}
+            onClick={() => setThemeSelectorOpen(true)}
             style={{ fontSize: 16 }}
           />
         </Tooltip>
+
+        <ThemeSelector
+          open={themeSelectorOpen}
+          onClose={() => setThemeSelectorOpen(false)}
+        />
 
         {/* Notificaciones */}
         <Tooltip title="Notificaciones">

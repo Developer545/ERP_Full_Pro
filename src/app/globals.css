@@ -47,12 +47,39 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   VARIABLES DE TEMA DINÁMICO — inyectadas por applyThemeCSSVars()
+   Fallbacks al tema naranja light por si aún no se aplicó el tema.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --theme-primary:            #f47920;
+  --theme-primary-rgb:        244,121,32;
+  --theme-success:            #52c41a;
+  --theme-warning:            #faad14;
+  --theme-error:              #ff4d4f;
+  --theme-info:               #f47920;
+  --theme-sider-bg:           #111111;
+  --theme-header-bg:          #ffffff;
+  --theme-content-bg:         #f0f2f5;
+  --theme-body-bg:            #f0f2f5;
+  --theme-menu-item-bg:       #111111;
+  --theme-menu-sub-bg:        #050505;
+  --theme-menu-selected-bg:   rgba(244,121,32,0.2);
+  --theme-menu-hover-bg:      rgba(244,121,32,0.1);
+  --theme-menu-color:         rgba(255,255,255,0.65);
+  --theme-menu-selected-color:#f47920;
+  --theme-border:             #e8e8e8;
+  --theme-shadow:             0 1px 4px rgba(0,0,0,0.08);
+  --scrollbar-thumb:          rgba(0,0,0,0.18);
+  --scrollbar-track:          rgba(0,0,0,0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    SCROLL PERSONALIZADO
    ═══════════════════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track, transparent); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb, #d9d9d9); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(var(--theme-primary-rgb, 244,121,32), 0.5); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ANT DESIGN OVERRIDES GLOBALES
@@ -66,14 +93,15 @@
   background-color: var(--color-primary-light) !important;
 }
 
-/* Item activo del sidebar — fuerza color primario sin depender de token AntD */
+/* Item activo del sidebar — usa variables de tema dinámico */
 .ant-menu-dark .ant-menu-item-selected,
 .ant-menu-dark.ant-menu-inline .ant-menu-item-selected {
-  background-color: var(--color-primary) !important;
+  background-color: var(--theme-menu-selected-bg) !important;
+  color: var(--theme-menu-selected-color) !important;
 }
 .ant-menu-dark .ant-menu-item:hover,
 .ant-menu-dark.ant-menu-inline .ant-menu-item:hover {
-  background-color: rgba(244, 121, 32, 0.1) !important;
+  background-color: var(--theme-menu-hover-bg) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

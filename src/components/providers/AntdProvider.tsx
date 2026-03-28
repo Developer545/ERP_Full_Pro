@@ -1,39 +1,42 @@
 "use client";
 
-import { ConfigProvider, theme as antTheme } from "antd";
+import { ConfigProvider } from "antd";
 import esES from "antd/locale/es_ES";
 import { useEffect, useState } from "react";
-import { lightTheme, darkTheme } from "@/config/theme";
+import { useThemeStore } from "@/stores/theme-store";
+import {
+  getThemeById,
+  buildAntThemeConfig,
+  applyThemeCSSVars,
+  DEFAULT_THEME_ID,
+} from "@/config/themes";
 
 /**
- * Proveedor de Ant Design con soporte de tema light/dark.
- * Debe envolver toda la app para que los componentes hereden el tema.
+ * Proveedor de Ant Design con sistema de temas completo.
+ * Sincronizado con useThemeStore (themeId + customColor).
+ * Aplica CSS vars + ThemeConfig de Ant Design dinámicamente.
  */
 export function AntdProvider({ children }: { children: React.ReactNode }) {
-  const [isDark, setIsDark] = useState(false);
+  const { themeId, customColor } = useThemeStore();
+  const [mounted, setMounted] = useState(false);
 
+  // Evitar hydration mismatch en Next.js
+  useEffect(() => setMounted(true), []);
+
+  const activeThemeId = mounted ? themeId : DEFAULT_THEME_ID;
+  const activeColor = mounted ? customColor : "";
+  const appTheme = getThemeById(activeThemeId);
+  const antConfig = buildAntThemeConfig(appTheme, activeColor);
+
+  // Aplicar CSS vars al :root cada vez que cambia el tema
   useEffect(() => {
-    // Detectar preferencia del sistema o guardada en localStorage
-    const saved = localStorage.getItem("theme-preference");
-    if (saved === "dark") {
-      setIsDark(true);
-      document.documentElement.setAttribute("data-theme", "dark");
-    } else if (saved === "light") {
-      setIsDark(false);
-    } else {
-      // Sistema
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDark(prefersDark);
-      if (prefersDark) document.documentElement.setAttribute("data-theme", "dark");
+    if (mounted) {
+      applyThemeCSSVars(appTheme, activeColor);
     }
-  }, []);
-
-  const currentTheme = isDark
-    ? { ...darkTheme, algorithm: antTheme.darkAlgorithm }
-    : lightTheme;
+  }, [mounted, appTheme, activeColor]);
 
   return (
-    <ConfigProvider theme={currentTheme} locale={esES}>
+    <ConfigProvider theme={antConfig} locale={esES}>
       {children}
     </ConfigProvider>
   );
