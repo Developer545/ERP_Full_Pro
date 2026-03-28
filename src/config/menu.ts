@@ -43,7 +43,8 @@ export const MENU_ITEMS: MenuItemConfig[] = [
     label: "Inventario",
     icon: "InboxOutlined",
     children: [
-      { key: "/productos", label: "Productos", icon: "TagOutlined" },
+      { key: "/categorias", label: "Categorias", icon: "TagOutlined" },
+      { key: "/productos", label: "Productos", icon: "ShoppingOutlined" },
       { key: "/inventario", label: "Kardex / Existencias", icon: "BarChartOutlined" },
     ],
   },
@@ -92,6 +93,12 @@ export const MENU_ITEMS: MenuItemConfig[] = [
     key: "/reportes",
     label: "Reportes",
     icon: "BarChartOutlined",
+  },
+  {
+    key: "/usuarios",
+    label: "Usuarios",
+    icon: "UserOutlined",
+    requiredRole: "ADMIN",
   },
   {
     key: "/configuracion",
