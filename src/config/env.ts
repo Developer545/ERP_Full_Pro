@@ -28,6 +28,8 @@ export const env = createEnv({
     SENTRY_DSN: z.string().optional(),
     // Cron jobs (Vercel)
     CRON_SECRET: z.string().optional(),
+    // Panel superadmin externo
+    ERP_SUPERADMIN_API_KEY: z.string().min(16, "ERP_SUPERADMIN_API_KEY debe tener minimo 16 caracteres"),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
@@ -46,6 +48,7 @@ export const env = createEnv({
     CLOUDINARY_URL: process.env.CLOUDINARY_URL,
     SENTRY_DSN: process.env.SENTRY_DSN,
     CRON_SECRET: process.env.CRON_SECRET,
+    ERP_SUPERADMIN_API_KEY: process.env.ERP_SUPERADMIN_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
